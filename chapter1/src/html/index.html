@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <style>
+        *{margin:0; padding:0;}
+        button{margin:5px;padding:5px;border:0;background-color:yellowgreen;cursor:pointer;}
+        input{padding:4px}
+        .sort strong{margin:0 5px}
+        .box_button{display:flex}
+        .app{display:flex;flex-wrap:wrap}
+        .item_project{margin:5px;padding:5px;border:1px solid yellowgreen;text-align:center;}
+        .item_project strong{display:block;}
+        .item_project img{width:200px}
+        .item_project .line_through{text-decoration:line-through;}
+    </style>
+</head>
+<body>
+    <div class="sort">
+        <div class="box_button">
+          <button class="btn_all">전체 보기</button>
+          <br />
+          <button class="btn_lg">LG만 보기</button>
+          <br />
+          <button class="btn_phone">휴대전화 제품 보기</button>
+        </div>
+        <strong>가격 직접입력</strong><input type="text" class="ip_min"> ~ <input type="text" class="ip_max"> <button class="btn_price">가격 제품 보기</button>
+        <br />
+        <strong>브랜드 && 제품명 직접입력</strong><input type="text" class="ip_"> && <input type="text"> <button class="btn_product">제품 보기</button>
+    </div>
+
+    <div class="app">
+      
+    </div>
+
+    <script>
+        const data = {
+            "name" : "가전제품 목록",
+            "description" : "가전제품 가전제품",
+            "list" : [
+                {
+                    "brand" : "LG",
+                    "title" : "TV",
+                    "price" : "2200000",
+                    "sales" : {
+                        "state" : "false",
+                        "discount" : "10%"
+                    },
+                    "img" : "https://www.lge.co.kr/kr/images/tvs/md10319886/gallery/medium01.jpg"
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "전자렌지",
+                    "price" : "190000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "15%"
+                    },
+                    "img" : "https://www.lge.co.kr/kr/images/microwaves-and-ovens/md10101826/gallery/medium01.jpg"
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "청소기",
+                    "price" : "660000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "10%"
+                    },
+                    "img" : "https://www.lge.co.kr/kr/images/vacuum-cleaners/md09946853/gallery/medium02.jpg"
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "공기청정기",
+                    "price" : "1300000",
+                    "sales" : {
+                        "state" : "false",
+                        "discount" : "15%"
+                    },
+                    "img" : "https://www.lge.co.kr/kr/images/air-purifier/md10055826/gallery/medium01.jpg"
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "가습기",
+                    "price" : "1400000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "5%"
+                    },
+                    "img" : "https://www.lge.co.kr/kr/images/dehumidifiers-and-humidifiers/md08038434/gallery/medium02.jpg"
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "휴대전화",
+                    "price" : "1000000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "15%"
+                    },
+                    "img" : "https://www.lge.co.kr/kr/images/smartphones/md08044183/gallery/medium01.jpg"
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "노트북",
+                    "price" : "1800000",
+                    "sales" : {
+                        "state" : "false",
+                        "discount" : "15%"
+                    },
+                    "img" : "https://www.lge.co.kr/kr/images/notebook/md10493826/gallery/medium01.jpg"
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "TV",
+                    "price" : "3000000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "7%"
+                    },
+                    "img" : "https://images.samsung.com/kdp/goods/2024/02/28/f6c5c863-a09f-4146-b46f-131c28b13be8.png?$PD_GALLERY_L_PNG$"
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "전자렌지",
+                    "price" : "160000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "7%"
+                    },
+                    "img" : "https://images.samsung.com/kdp/goods/2023/07/18/08ad0bc6-6698-41c2-bfc2-c8772534f2b8.png?$PD_GALLERY_L_PNG$"
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "청소기",
+                    "price" : "820000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "12%"
+                    },
+                    "img" : "https://images.samsung.com/kdp/goods/2024/02/08/60370e1f-1c0d-406b-9c76-cdc25bd23920.png?$PD_GALLERY_L_PNG$"
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "공기청정기",
+                    "price" : "400000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "5%"
+                    },
+                    "img" : "https://images.samsung.com/kdp/goods/2024/02/29/a5f5d6d4-7e34-4064-a5fd-e1b3c00c5ddc.png?$PD_GALLERY_L_PNG$"
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "가습기",
+                    "price" : "340000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "10%"
+                    },
+                    "img" : "https://images.samsung.com/kdp/goods/2024/11/12/62815cfe-1eab-405a-ad68-6a19a30826ed.png?$PD_GALLERY_L_PNG$"
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "휴대전화",
+                    "price" : "1600000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "20%"
+                    },
+                    "img" : "https://images.samsung.com/kdp/goods/2025/01/15/7f89e279-9f41-4fdc-aa62-1097a02038af.png?$944_550_PNG$"
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "노트북",
+                    "price" : "1350000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "15%"
+                    },
+                    "img" : "https://images.samsung.com/kdp/goods/2025/01/14/326781b2-e6a7-4af7-838d-db4a30044af4.png?$944_550_PNG$"
+                },
+                {
+                    "brand" : "애플",
+                    "title" : "휴대전화",
+                    "price" : "1700000",
+                    "sales" : {
+                        "state" : "false",
+                        "discount" : "15%"
+                    },
+                    "img" : "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch_AV1?wid=5120&hei=2880&fmt=webp&qlt=70&.v=eUdsd0dIb3VUOXdtWkY0VFUwVE8vbEdkZHNlSjBQRklnaFB2d3I5MW94NkNpOHVpN2R5VUJjZHdaZUw2U1IwaWxjZnhHRHJyenVmME5KTm9Sd1ZaU2hpQnMxbm94Rm1tUTd1RDVsQXdjSzJpZHVHMUZLaU5RYVppZElabURWRndGblJodVFEaGgxMERMNjl1RlVMTnp3&traceId=1"
+                },
+                {
+                    "brand" : "애플",
+                    "title" : "노트북",
+                    "price" : "3500000",
+                    "sales" : {
+                        "state" : "true",
+                        "discount" : "1%"
+                    },
+                    "img" : "https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mbp14-spaceblack-gallery6-202410?wid=4000&hei=3074&fmt=jpeg&qlt=90&.v=1729264983033"
+                }
+            ]
+        }
+
+        const app = document.querySelector('.app');
+        const btnAll = document.querySelector('btn_all');
+        const btnLg = document.querySelector('btn_lg');
+        const btnPhone = document.querySelector('btn_phone');
+        const btnPrice = document.querySelector('btn_price');
+        const btnProduct = document.querySelector('btn_product');
+        let templete = '';
+
+
+        const write = () => {
+            // console.log(data);
+            let sale = 0;
+            let dataList = data.list.map((item) => {
+              if(item.sales.state) {
+                sale = item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100);
+              }
+              
+              return `<div class="item_project">
+                        <img src="${item.img}" alt="${item.title}">
+                        <strong>
+                          <span class="txt_brand">${item.brand}</span>
+                          <span>-</span>
+                          <span class="txt_title">${item.title}</span>
+                        </strong>
+                        ${
+                          item.sales.state === 'true' ? 
+                          `<span class="txt_discount">${item.sales.discount}</span>
+                            <span class="desc_price">
+                              <span class="txt_price line_through">${item.price}원</span>
+                              <span class="txt_sale">${sale}원</span>
+                          </span>` : 
+                          `<span class="desc_price">
+                              <span class="txt_price">${item.price}원</span>
+                          </span>`
+                        }
+                      </div>`;
+                console.log(item, item.sales.state);
+            });
+            app.innerHTML += dataList.join('');
+        }
+
+        write();
+    </script>
+</body>
+</html>
