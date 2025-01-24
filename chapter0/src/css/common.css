@@ -1,0 +1,50 @@
+/* reset */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,textarea,p,blockquote,th,td,input,select,button{margin:0;padding:0}
+fieldset,img{border:0 none}
+dl,ul,ol,menu,li{list-style:none}
+blockquote, q{quotes: none}
+blockquote:before, blockquote:after,q:before, q:after{content:'';content:none}
+input,select,textarea,button{vertical-align:middle}
+input::-ms-clear{display:none}
+button{border:0 none;background-color:transparent;cursor:pointer}
+body{background:#fff}
+body,th,td,input,select,textarea,button{font-size:14px;line-height:1.5;font-family:'돋움',dotum,sans-serif;color:#333} /* color값은 디자인가이드에 맞게사용 */
+a{color:#333;text-decoration:none}
+a:active, a:hover{text-decoration:underline}
+a:active{background-color:transparent}
+address,caption,cite,code,dfn,em,var{font-style:normal;font-weight:normal}
+
+.wrap_shopping{position:relative;display:flex;flex-wrap:wrap;width:1000px;margin:0 auto}
+.wrap_shopping h1{width:100%;text-align:center}
+.wrap_shopping .title{text-align:center;background-color:skyblue}
+.wrap_shopping .wrap_wallet{position:absolute;top:0;right:0}
+
+.wrap_product{position:relative;width:500px;border:1px solid #000;box-sizing:border-box}
+.list_product{padding:0 20px}
+.list_product li{position:relative;padding:20px 0 20px 25px}
+.list_product .inp_check{position:absolute;top:20px;left:0;width:20px;height:20px;cursor:pointer}
+.list_product label{cursor:pointer}
+.list_product .inp_count{padding:4px 0;text-align:center;cursor:not-allowed}
+.list_product li.disabled label,
+.list_product li.disabled p{text-decoration:line-through}
+.list_product li.disabled p{cursor:not-allowed}
+.list_product li.disabled .inp_check:disabled,
+.list_product li.disabled .inp_check:disabled + label{cursor:not-allowed}
+.list_product li.disabled .inp_count{border-color:rgba(59, 27, 27, 0.05)}
+
+.btn_plus,
+.btn_minus{
+  padding:5px;border:1px solid #000;
+}
+.btn_plus:disabled,
+.btn_minus:disabled{border-color:rgba(0,0,0,0.05);background-color:rgba(0,0,0,0.03);cursor:not-allowed}
+.btn_cart{margin:0 20px 20px;padding:5px;border:1px solid #000}
+
+.wrap_cart{width:500px;border:1px solid #000;box-sizing:border-box}
+.total_price{padding:20px;font-weight:700}
+.btn_pay{margin:0 20px;padding:5px;border:1px solid #000}
+
+.box_tooltip{position:absolute;top:0;right:0}
+.btn_tooltip{padding:7px 10px;font-size:0}
+.desc_tooltip{display:none;position:absolute;top:38px;left:50%;width:200px;text-align:center;transform:translateX(-50%);background-color:deepskyblue}
+.box_tooltip.on .desc_tooltip{display:block}
