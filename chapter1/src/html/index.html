@@ -8,9 +8,9 @@
         .sort strong{margin:0 5px}
         .box_button{display:flex}
         .app{display:flex;flex-wrap:wrap}
-        .item_project{margin:5px;padding:5px;border:1px solid yellowgreen;text-align:center;}
-        .item_project strong{display:block;}
-        .item_project img{width:200px}
+        .item_project{display:flex;flex-direction:column;justify-content:center;align-items:center;width:230px;height:250px;margin:5px;padding:5px;border:1px solid yellowgreen;box-sizing:border-box}
+        .item_project strong{padding:5px 0}
+        .item_project img{width:180px}
         .item_project .line_through{text-decoration:line-through;}
     </style>
 </head>
@@ -25,7 +25,7 @@
         </div>
         <strong>가격 직접입력</strong><input type="text" class="ip_min"> ~ <input type="text" class="ip_max"> <button class="btn_price">가격 제품 보기</button>
         <br />
-        <strong>브랜드 && 제품명 직접입력</strong><input type="text" class="ip_"> && <input type="text"> <button class="btn_product">제품 보기</button>
+        <strong>브랜드 && 제품명 직접입력</strong><input type="text" class="ip_brand"> && <input type="text" class="ip_product"> <button class="btn_product">제품 보기</button>
     </div>
 
     <div class="app">
@@ -66,6 +66,16 @@
                         "discount" : "10%"
                     },
                     "img" : "https://www.lge.co.kr/kr/images/vacuum-cleaners/md09946853/gallery/medium02.jpg"
+                },
+								{
+                    "brand" : "LG",
+                    "title" : "로봇청소기",
+                    "price" : "1900000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "10%"
+                    },
+                    "img" : "https://www.lge.co.kr/kr/images/vacuum-cleaners/md10436831/gallery/large01.jpg"
                 },
                 {
                     "brand" : "LG",
@@ -208,6 +218,8 @@
         const btnProduct = document.querySelector('.btn_product');
 				const ipMin = document.querySelector('.ip_min');
 				const ipMax = document.querySelector('.ip_max');
+				const ipBrand = document.querySelector('.ip_brand');
+				const ipProduct = document.querySelector('.ip_product');
         let dataList = '';
 
         const view = (dataList) => {
@@ -229,17 +241,19 @@
                           <span>-</span>
                           <span class="txt_title">${item.title}</span>
                         </strong>
-                        ${
-                          item.sales.state ? 
-                          `<span class="txt_discount">${item.sales.discount}</span>
-                            <span class="desc_price">
-                              <span class="txt_price line_through">${item.price}원</span>
-                              <span class="txt_sale">${sale}원</span>
-                          </span>` : 
-                          `<span class="desc_price">
-                              <span class="txt_price">${item.price}원</span>
-                          </span>`
-                        }
+                        <div>
+													${
+														item.sales.state ? 
+														`<span class="txt_discount">${item.sales.discount}</span>
+															<span class="desc_price">
+																<span class="txt_price line_through">${Number(item.price).toLocaleString()}원</span>
+																<span class="txt_sale">${sale.toLocaleString()}원</span>
+														</span>` : 
+														`<span class="desc_price">
+																<span class="txt_price">${Number(item.price).toLocaleString()}원</span>
+														</span>`
+													}
+												</div>
                       </div>`;
             });
             app.innerHTML += itemProject.join('');
@@ -268,29 +282,50 @@
 				});
 
 				btnPrice.addEventListener('click', function(){
-					if(ipMin.value == 0 || ipMax.value == 0){
-						alert('검색하고 싶은 최소/최대 가격을 입력해주세요');
+					const min = Number(ipMin.value);
+					const max = Number(ipMax.value);
+					
+					if(min <= 0 || max <= 0){
+						alert('검색하고 싶은 최소/최대 가격을 0이상으로 입력해주세요');
 					}else{
-						if(isNaN(ipMin.value) || isNaN(ipMax.value)){
+						if(isNaN(min) || isNaN(max)){
 							alert('숫자로 입력해주세요');
 						}else{
-							dataList = data.list.filter((item) => {
-								if(item.sales.state) {
-									let sale = 0;
-									sale = item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100);
-									return ipMin.value >= sale && ipMax.value <= sale;
-								}else{
-									return ipMin.value >= item.price && ipMax.value <= item.price;
-								}
+							if(min < max){
+								dataList = data.list.filter((item) => {
+									const salePrice = item.sales.state ? item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100) : item.price;
+									return salePrice >= min && salePrice <= max;
+								});
 
-								// console.log(ipMin.value >= item.price && ipMax.value <= item.price);
-								// console.log(dataList);
-								
-							});
-							view(dataList);
-							
-							
+								if(dataList.length == 0){
+									alert('일치하는 가격대가 없습니다');
+								}
+								view(dataList);
+							}else{
+								alert('최소가격이 최대가격보다 작게 입력해주세요');
+							}
 						}
+					}
+				});
+
+				btnProduct.addEventListener('click', function(){
+					const txtBrand = ipBrand.value;
+					const txtProduct = ipProduct.value;
+
+					if(txtBrand == '' || txtProduct == ''){
+						alert('검색하고 싶은 브랜드명/제품명을 입력해주세요');
+					}else{
+						
+						dataList = data.list.filter((item) => {
+							const brand = item.brand.toLowerCase();
+							const product = item.title.toLowerCase();
+							return txtBrand.toLowerCase() == brand && product.includes(txtProduct);
+						});
+						
+						if(dataList.length == 0){
+							alert('일치하는 브랜드명/제품명이 없습니다');
+						}
+						view(dataList);
 					}
 				});
     </script>
