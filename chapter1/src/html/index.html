@@ -260,26 +260,43 @@
         }
         view(dataList);
 				
-				btnAll.addEventListener('click', function(){
-					dataList = data.list.filter((item) => {
-						return item;
-					});
+				function filterData(data, rule){
+					dataList = data.filter(rule);
 					view(dataList);
+				}
+
+				btnAll.addEventListener('click', () => {
+					filterData(data.list, item => item)
 				});
 
-				btnLg.addEventListener('click', function(){
-					dataList = data.list.filter((item) => {
-						return item.brand === 'LG';
-					});
-					view(dataList);
+				btnLg.addEventListener('click', () => {
+					filterData(data.list, item => item.brand === 'LG');
 				});
 
-				btnPhone.addEventListener('click', function(){
-					dataList = data.list.filter((item) => {
-						return item.title === '휴대전화';
-					});
-					view(dataList);
+				btnPhone.addEventListener('click', () => {
+					filterData(data.list, item => item.title === '휴대전화');
 				});
+
+				// btnAll.addEventListener('click', function(){
+				// 	dataList = data.list.filter((item) => {
+				// 		return item;
+				// 	});
+				// 	view(dataList);
+				// });
+
+				// btnLg.addEventListener('click', function(){
+				// 	dataList = data.list.filter((item) => {
+				// 		return item.brand === 'LG';
+				// 	});
+				// 	view(dataList);
+				// });
+
+				// btnPhone.addEventListener('click', function(){
+				// 	dataList = data.list.filter((item) => {
+				// 		return item.title === '휴대전화';
+				// 	});
+				// 	view(dataList);
+				// });
 
 				btnPrice.addEventListener('click', function(){
 					const min = Number(ipMin.value);
