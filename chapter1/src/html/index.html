@@ -212,7 +212,6 @@
         }
 
         // 전역 변수 선언
-        const app = document.querySelector('.app');
         const btnAll = document.querySelector('.btn_all');
         const btnLg = document.querySelector('.btn_lg');
         const btnPhone = document.querySelector('.btn_phone');
@@ -220,18 +219,14 @@
         const btnProduct = document.querySelector('.btn_product');
         const ipMin = document.querySelector('.ip_min');
         const ipMax = document.querySelector('.ip_max');
-        const ipBrand = document.querySelector('.ip_brand');
-        const ipProduct = document.querySelector('.ip_product');
-        let dataList = '';
 
         // 리스트 출력
-        function view(dataList){
+        function view(dataList = data.list){
+            const app = document.querySelector('.app');
             let sale = 0;
 						
             app.innerHTML = '';
 
-            dataList == '' ? dataList = data.list : dataList;
-            
             const itemProject = dataList.map((item) => {
                 if(item.sales.state) {
                     sale = item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100);
@@ -261,11 +256,37 @@
             });
             app.innerHTML += itemProject.join('');
         }
+
+        // 필터 함수 정의
+        function filterFn(btnName){
+            switch (btnName) {
+                case 'all':
+                    view();
+                    break;
+                case 'lg':
+                    filterData(item => item.brand === 'LG');
+                    break;
+                case 'phone':
+                    filterData(item => item.title === '휴대전화');
+                    break;
+                case 'price':
+                    priceChk();
+                    break;
+                case 'product':
+                    productChk();
+                    break;
+            }
+        }
 		
         // 조건 필터링
-        function filterData(data, rule){
-            dataList = data.filter(rule);
-            view(dataList);
+        function filterData(rule){
+            let filterDataList = data.list.filter(rule);
+            
+            if(filterDataList.length == 0){
+                alert('일치하는 검색 결과가 없습니다');
+                filterDataList = data.list;
+            }
+            view(filterDataList);
         }
         
         // 숫자만 입력
@@ -289,15 +310,10 @@
                 alert('검색하고 싶은 최소/최대 가격을 0이상으로 입력해주세요');
             }else{
                 if(min < max){
-                    filterData(data.list, item => {
+                    filterData(item => {
                         const salePrice = item.sales.state ? item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100) : item.price;
                         return salePrice >= min && salePrice <= max;
                     });
-
-                    if(dataList.length == 0){
-                        alert('일치하는 가격대가 없습니다');
-                    }
-                    view(dataList);
                 }else{
                     alert('최소가격이 최대가격보다 작게 입력해주세요');
                 }
@@ -306,56 +322,52 @@
 
         // 상품 검색
         function productChk(){
+            const ipBrand = document.querySelector('.ip_brand');
+            const ipProduct = document.querySelector('.ip_product');
             const txtBrand = ipBrand.value;
             const txtProduct = ipProduct.value;
 
             if(txtBrand == '' || txtProduct == ''){
                 alert('검색하고 싶은 브랜드명/제품명을 입력해주세요');
             }else{
-                filterData(data.list, item => {
+                filterData(item => {
                     const brand = item.brand.toLowerCase();
                     const product = item.title.toLowerCase();
                     return txtBrand.toLowerCase() == brand && product.includes(txtProduct);
                 });
-                
-                if(dataList.length == 0){
-                    alert('일치하는 브랜드명/제품명이 없습니다');
-                }
-                view(dataList);
             }
         }
 
         // 초기화
         function init(){
-            view(dataList);
+            view();
             bindEvents();
         }
 
         // 이벤트 연결
         function bindEvents(){
             btnAll.addEventListener('click', () => {
-                filterData(data.list, item => item)
+                filterFn('all');
             });
 
             btnLg.addEventListener('click', () => {
-                filterData(data.list, item => item.brand === 'LG');
+                filterFn('lg');
             });
 
             btnPhone.addEventListener('click', () => {
-                filterData(data.list, item => item.title === '휴대전화');
+                filterFn('phone');
+            });
+
+            btnPrice.addEventListener('click', () => {
+                filterFn('price');
+            });
+
+            btnProduct.addEventListener('click', () => {
+                filterFn('product');
             });
             
-            ipMin.addEventListener('keydown', (e) => {
-                numberChk(e);
-            });
-
-            ipMax.addEventListener('keydown', (e) => {
-                numberChk(e);
-            });
-
-            btnPrice.addEventListener('click', priceChk);
-
-            btnProduct.addEventListener('click', productChk);
+            ipMin.addEventListener('keydown', numberChk);
+            ipMax.addEventListener('keydown', numberChk);
         }
 
         document.addEventListener('DOMContentLoaded', init);
