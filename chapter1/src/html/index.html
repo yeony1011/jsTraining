@@ -17,11 +17,11 @@
 <body>
     <div class="sort">
         <div class="box_button">
-          <button class="btn_all">전체 보기</button>
-          <br />
-          <button class="btn_lg">LG만 보기</button>
-          <br />
-          <button class="btn_phone">휴대전화 제품 보기</button>
+            <button class="btn_all">전체 보기</button>
+            <br />
+            <button class="btn_lg">LG만 보기</button>
+            <br />
+            <button class="btn_phone">휴대전화 제품 보기</button>
         </div>
         <strong>가격 직접입력</strong><input type="text" class="ip_min"> ~ <input type="text" class="ip_max"> <button class="btn_price">가격 제품 보기</button>
         <br />
@@ -29,7 +29,7 @@
     </div>
 
     <div class="app">
-      
+
     </div>
 
     <script>
@@ -216,135 +216,133 @@
         const btnPhone = document.querySelector('.btn_phone');
         const btnPrice = document.querySelector('.btn_price');
         const btnProduct = document.querySelector('.btn_product');
-				const ipMin = document.querySelector('.ip_min');
-				const ipMax = document.querySelector('.ip_max');
-				const ipBrand = document.querySelector('.ip_brand');
-				const ipProduct = document.querySelector('.ip_product');
+        const ipMin = document.querySelector('.ip_min');
+        const ipMax = document.querySelector('.ip_max');
+        const ipBrand = document.querySelector('.ip_brand');
+        const ipProduct = document.querySelector('.ip_product');
         let dataList = '';
 
+        // 리스트 출력
         const view = (dataList) => {
             let sale = 0;
 						
-						app.innerHTML = '';
+            app.innerHTML = '';
 
-						dataList == '' ? dataList = data.list : dataList;
-						
-						const itemProject = dataList.map((item) => {
-              if(item.sales.state) {
-                sale = item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100);
-              }
-              
-              return `<div class="item_project">
-                        <img src="${item.img}" alt="${item.title}">
-                        <strong>
-                          <span class="txt_brand">${item.brand}</span>
-                          <span>-</span>
-                          <span class="txt_title">${item.title}</span>
+            dataList == '' ? dataList = data.list : dataList;
+            
+            const itemProject = dataList.map((item) => {
+                if(item.sales.state) {
+                    sale = item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100);
+                }
+
+                return `<div class="item_project">
+                            <img src="${item.img}" alt="${item.title}">
+                            <strong>
+                                <span class="txt_brand">${item.brand}</span>
+                            <span>-</span>
+                            <span class="txt_title">${item.title}</span>
                         </strong>
                         <div>
-													${
-														item.sales.state ? 
-														`<span class="txt_discount">${item.sales.discount}</span>
-															<span class="desc_price">
-																<span class="txt_price line_through">${Number(item.price).toLocaleString()}원</span>
-																<span class="txt_sale">${sale.toLocaleString()}원</span>
-														</span>` : 
-														`<span class="desc_price">
-																<span class="txt_price">${Number(item.price).toLocaleString()}원</span>
-														</span>`
-													}
-												</div>
-                      </div>`;
+                            ${
+                                item.sales.state ? 
+                                `<span class="txt_discount">${item.sales.discount}</span>
+                                    <span class="desc_price">
+                                        <span class="txt_price line_through">${Number(item.price).toLocaleString()}원</span>
+                                        <span class="txt_sale">${sale.toLocaleString()}원</span>
+                                </span>` : 
+                                `<span class="desc_price">
+                                        <span class="txt_price">${Number(item.price).toLocaleString()}원</span>
+                                </span>`
+                            }
+                        </div>
+                    </div>`;
             });
             app.innerHTML += itemProject.join('');
         }
         view(dataList);
-				
-				function filterData(data, rule){
-					dataList = data.filter(rule);
-					view(dataList);
-				}
+		
+        // 조건 필터링
+        function filterData(data, rule){
+            dataList = data.filter(rule);
+            view(dataList);
+        }
 
-				btnAll.addEventListener('click', () => {
-					filterData(data.list, item => item)
-				});
+        btnAll.addEventListener('click', () => {
+            filterData(data.list, item => item)
+        });
 
-				btnLg.addEventListener('click', () => {
-					filterData(data.list, item => item.brand === 'LG');
-				});
+        btnLg.addEventListener('click', () => {
+            filterData(data.list, item => item.brand === 'LG');
+        });
 
-				btnPhone.addEventListener('click', () => {
-					filterData(data.list, item => item.title === '휴대전화');
-				});
+        btnPhone.addEventListener('click', () => {
+            filterData(data.list, item => item.title === '휴대전화');
+        });
 
-				// btnAll.addEventListener('click', function(){
-				// 	dataList = data.list.filter((item) => {
-				// 		return item;
-				// 	});
-				// 	view(dataList);
-				// });
 
-				// btnLg.addEventListener('click', function(){
-				// 	dataList = data.list.filter((item) => {
-				// 		return item.brand === 'LG';
-				// 	});
-				// 	view(dataList);
-				// });
+        // 숫자만 입력
+        function numberChk(e){
+            const keyCode = e.keyCode;
+            const okKeyCode = [8, 9, 13, 16, 37, 39, 46]; // backspace, tab, enter, shift, arrow left, arrow right, delete
 
-				// btnPhone.addEventListener('click', function(){
-				// 	dataList = data.list.filter((item) => {
-				// 		return item.title === '휴대전화';
-				// 	});
-				// 	view(dataList);
-				// });
+            if((keyCode < 48 || keyCode > 57) && !okKeyCode.includes(keyCode)){
+                alert('숫자만 입력 가능합니다');
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                e.preventDefault();
+            }
+        }
 
-				btnPrice.addEventListener('click', function(){
-					const min = Number(ipMin.value);
-					const max = Number(ipMax.value);
-					
-					if(min <= 0 || max <= 0){
-						alert('검색하고 싶은 최소/최대 가격을 0이상으로 입력해주세요');
-					}else{
-						if(isNaN(min) || isNaN(max)){
-							alert('숫자로 입력해주세요');
-						}else{
-							if(min < max){
-								dataList = data.list.filter((item) => {
-									const salePrice = item.sales.state ? item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100) : item.price;
-									return salePrice >= min && salePrice <= max;
-								});
+        ipMin.addEventListener('keydown', (e) => {
+            numberChk(e);
+        });
 
-								if(dataList.length == 0){
-									alert('일치하는 가격대가 없습니다');
-								}
-								view(dataList);
-							}else{
-								alert('최소가격이 최대가격보다 작게 입력해주세요');
-							}
-						}
-					}
-				});
+        ipMax.addEventListener('keydown', (e) => {
+            numberChk(e);
+        });
 
-				btnProduct.addEventListener('click', function(){
-					const txtBrand = ipBrand.value;
-					const txtProduct = ipProduct.value;
 
-					if(txtBrand == '' || txtProduct == ''){
-						alert('검색하고 싶은 브랜드명/제품명을 입력해주세요');
-					}else{
-						
-						dataList = data.list.filter((item) => {
-							const brand = item.brand.toLowerCase();
-							const product = item.title.toLowerCase();
-							return txtBrand.toLowerCase() == brand && product.includes(txtProduct);
-						});
-						
-						if(dataList.length == 0){
-							alert('일치하는 브랜드명/제품명이 없습니다');
-						}
-						view(dataList);
-					}
-				});
+        btnPrice.addEventListener('click', function(){
+            const min = Number(ipMin.value);
+            const max = Number(ipMax.value);
+            
+            if(min <= 0 || max <= 0){
+                alert('검색하고 싶은 최소/최대 가격을 0이상으로 입력해주세요');
+            }else{
+                if(min < max){
+                    filterData(data.list, item => {
+                        const salePrice = item.sales.state ? item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100) : item.price;
+                        return salePrice >= min && salePrice <= max;
+                    });
+
+                    if(dataList.length == 0){
+                        alert('일치하는 가격대가 없습니다');
+                    }
+                    view(dataList);
+                }else{
+                    alert('최소가격이 최대가격보다 작게 입력해주세요');
+                }
+            }
+        });
+
+        btnProduct.addEventListener('click', function(){
+            const txtBrand = ipBrand.value;
+            const txtProduct = ipProduct.value;
+
+            if(txtBrand == '' || txtProduct == ''){
+                alert('검색하고 싶은 브랜드명/제품명을 입력해주세요');
+            }else{
+                filterData(data.list, item => {
+                    const brand = item.brand.toLowerCase();
+                    const product = item.title.toLowerCase();
+                    return txtBrand.toLowerCase() == brand && product.includes(txtProduct);
+                });
+                
+                if(dataList.length == 0){
+                    alert('일치하는 브랜드명/제품명이 없습니다');
+                }
+                view(dataList);
+            }
+        });
     </script>
 </body>
 </html>
