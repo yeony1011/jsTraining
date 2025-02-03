@@ -33,6 +33,7 @@
     </div>
 
     <script>
+        // 상품 데이터
         const data = {
             "name" : "가전제품 목록",
             "description" : "가전제품 가전제품",
@@ -210,6 +211,7 @@
             ]
         }
 
+        // 전역 변수 선언
         const app = document.querySelector('.app');
         const btnAll = document.querySelector('.btn_all');
         const btnLg = document.querySelector('.btn_lg');
@@ -223,7 +225,7 @@
         let dataList = '';
 
         // 리스트 출력
-        const view = (dataList) => {
+        function view(dataList){
             let sale = 0;
 						
             app.innerHTML = '';
@@ -259,27 +261,13 @@
             });
             app.innerHTML += itemProject.join('');
         }
-        view(dataList);
 		
         // 조건 필터링
         function filterData(data, rule){
             dataList = data.filter(rule);
             view(dataList);
         }
-
-        btnAll.addEventListener('click', () => {
-            filterData(data.list, item => item)
-        });
-
-        btnLg.addEventListener('click', () => {
-            filterData(data.list, item => item.brand === 'LG');
-        });
-
-        btnPhone.addEventListener('click', () => {
-            filterData(data.list, item => item.title === '휴대전화');
-        });
-
-
+        
         // 숫자만 입력
         function numberChk(e){
             const keyCode = e.keyCode;
@@ -292,16 +280,8 @@
             }
         }
 
-        ipMin.addEventListener('keydown', (e) => {
-            numberChk(e);
-        });
-
-        ipMax.addEventListener('keydown', (e) => {
-            numberChk(e);
-        });
-
-
-        btnPrice.addEventListener('click', function(){
+        // 가격 검색
+        function priceChk(){
             const min = Number(ipMin.value);
             const max = Number(ipMax.value);
             
@@ -322,9 +302,10 @@
                     alert('최소가격이 최대가격보다 작게 입력해주세요');
                 }
             }
-        });
+        }
 
-        btnProduct.addEventListener('click', function(){
+        // 상품 검색
+        function productChk(){
             const txtBrand = ipBrand.value;
             const txtProduct = ipProduct.value;
 
@@ -342,7 +323,42 @@
                 }
                 view(dataList);
             }
-        });
+        }
+
+        // 초기화
+        function init(){
+            view(dataList);
+            bindEvents();
+        }
+
+        // 이벤트 연결
+        function bindEvents(){
+            btnAll.addEventListener('click', () => {
+                filterData(data.list, item => item)
+            });
+
+            btnLg.addEventListener('click', () => {
+                filterData(data.list, item => item.brand === 'LG');
+            });
+
+            btnPhone.addEventListener('click', () => {
+                filterData(data.list, item => item.title === '휴대전화');
+            });
+            
+            ipMin.addEventListener('keydown', (e) => {
+                numberChk(e);
+            });
+
+            ipMax.addEventListener('keydown', (e) => {
+                numberChk(e);
+            });
+
+            btnPrice.addEventListener('click', priceChk);
+
+            btnProduct.addEventListener('click', productChk);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
