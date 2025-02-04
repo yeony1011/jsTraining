@@ -7,6 +7,9 @@
         input{padding:4px}
         .sort strong{margin:0 5px}
         .box_button{display:flex}
+        .box_button strong{line-height:36px}
+        .ip_select{width:100px;height:26px;margin:5px 0}
+        .ip_select + strong{margin-left:15px}
         .app{display:flex;flex-wrap:wrap}
         .item_project{display:flex;flex-direction:column;justify-content:center;align-items:center;width:230px;height:250px;margin:5px;padding:5px;border:1px solid yellowgreen;box-sizing:border-box}
         .item_project strong{padding:5px 0}
@@ -22,6 +25,28 @@
             <button class="btn_lg">LG만 보기</button>
             <br />
             <button class="btn_phone">휴대전화 제품 보기</button>
+        </div>
+        <div class="box_button">
+            <strong>브랜드</strong>
+            <select class="ip_select" data-select="brand">
+                <option value="">선택</option>
+                <option value="LG">LG</option>
+                <option value="삼성">삼성</option>
+                <option value="애플">애플</option>
+            </select>
+            <strong>제품</strong>
+            <select class="ip_select" data-select="product">
+                <option value="">선택</option>
+                <option value="TV">TV</option>
+                <option value="전자렌지">전자렌지</option>
+                <option value="청소기">청소기</option>
+                <option value="로봇청소기">로봇청소기</option>
+                <option value="공기청정기">공기청정기</option>
+                <option value="가습기">가습기</option>
+                <option value="휴대전화">휴대전화</option>
+                <option value="노트북">노트북</option>
+            </select>
+            <button class="btn_search">검색</button>
         </div>
         <strong>가격 직접입력</strong><input type="text" class="ip_min"> ~ <input type="text" class="ip_max"> <button class="btn_price">가격 제품 보기</button>
         <br />
@@ -206,7 +231,7 @@
                         "state" : true,
                         "discount" : "1%"
                     },
-                    "img" : "https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mbp14-spaceblack-gallery6-202410?wid=4000&hei=3074&fmt=jpeg&qlt=90&.v=1729264983033"
+                    "img" : "https://www.apple.com/kr/macbook-air/images/overview/switchers/new_mac_can_take_it__fivaqh94qmuu_medium_2x.jpg"
                 }
             ]
         }
@@ -217,6 +242,7 @@
         const btnPhone = document.querySelector('.btn_phone');
         const btnPrice = document.querySelector('.btn_price');
         const btnProduct = document.querySelector('.btn_product');
+        const btnSearch = document.querySelector('.btn_search');
         const ipMin = document.querySelector('.ip_min');
         const ipMax = document.querySelector('.ip_max');
 
@@ -224,7 +250,7 @@
         function view(dataList = data.list){
             const app = document.querySelector('.app');
             let sale = 0;
-						
+
             app.innerHTML = '';
 
             const itemProject = dataList.map((item) => {
@@ -236,23 +262,23 @@
                             <img src="${item.img}" alt="${item.title}">
                             <strong>
                                 <span class="txt_brand">${item.brand}</span>
-                            <span>-</span>
-                            <span class="txt_title">${item.title}</span>
-                        </strong>
-                        <div>
-                            ${
-                                item.sales.state ? 
-                                `<span class="txt_discount">${item.sales.discount}</span>
-                                    <span class="desc_price">
-                                        <span class="txt_price line_through">${Number(item.price).toLocaleString()}원</span>
-                                        <span class="txt_sale">${sale.toLocaleString()}원</span>
-                                </span>` : 
-                                `<span class="desc_price">
-                                        <span class="txt_price">${Number(item.price).toLocaleString()}원</span>
-                                </span>`
-                            }
-                        </div>
-                    </div>`;
+                                <span>-</span>
+                                <span class="txt_title">${item.title}</span>
+                            </strong>
+                            <div>
+                                ${
+                                    item.sales.state ? 
+                                    `<span class="txt_discount">${item.sales.discount}</span>
+                                        <span class="desc_price">
+                                            <span class="txt_price line_through">${Number(item.price).toLocaleString()}원</span>
+                                            <span class="txt_sale">${sale.toLocaleString()}원</span>
+                                    </span>` : 
+                                    `<span class="desc_price">
+                                            <span class="txt_price">${Number(item.price).toLocaleString()}원</span>
+                                    </span>`
+                                }
+                            </div>
+                        </div>`;
             });
             app.innerHTML += itemProject.join('');
         }
@@ -274,6 +300,9 @@
                     break;
                 case 'product':
                     productChk();
+                    break;
+                case 'search':
+                    searchChk();
                     break;
             }
         }
@@ -320,7 +349,7 @@
             }
         }
 
-        // 상품 검색
+        // 상품 직접입력 검색
         function productChk(){
             const ipBrand = document.querySelector('.ip_brand');
             const ipProduct = document.querySelector('.ip_product');
@@ -334,6 +363,22 @@
                     const brand = item.brand.toLowerCase();
                     const product = item.title.toLowerCase();
                     return txtBrand.toLowerCase() == brand && product.includes(txtProduct);
+                });
+            }
+        }
+
+        // 상품 선택 검색
+        function searchChk(){
+            const ipBrand = document.querySelector('.ip_select[data-select="brand"]');
+            const ipProduct = document.querySelector('.ip_select[data-select="product"]');
+            
+            if(ipBrand.value == '' || ipProduct.value == ''){
+                alert('검색하고 싶은 브랜드명/제품명을 선택해주세요');
+            }else{
+                filterData(item => {
+                    const brand = item.brand;
+                    const product = item.title;
+                    return brand == ipBrand.value && product == ipProduct.value;
                 });
             }
         }
@@ -364,6 +409,10 @@
 
             btnProduct.addEventListener('click', () => {
                 filterFn('product');
+            });
+
+            btnSearch.addEventListener('click', () => {
+                filterFn('search');
             });
             
             ipMin.addEventListener('keydown', numberChk);
