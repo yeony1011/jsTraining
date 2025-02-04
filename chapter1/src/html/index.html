@@ -11,7 +11,8 @@
         .ip_select{width:100px;height:26px;margin:5px 0}
         .ip_select + strong{margin-left:15px}
         .app{display:flex;flex-wrap:wrap}
-        .item_project{display:flex;flex-direction:column;justify-content:center;align-items:center;width:230px;height:250px;margin:5px;padding:5px;border:1px solid yellowgreen;box-sizing:border-box}
+        .item_project{display:flex;flex-direction:column;justify-content:center;align-items:center;width:230px;height:250px;margin:5px;padding:5px;border:1px solid yellowgreen;box-sizing:border-box;transition:all .5s ease}
+        .item_project.on{border-width:5px;background-color:rgba(154, 205, 50, 0.3)}
         .item_project strong{padding:5px 0}
         .item_project img{width:180px}
         .item_project .line_through{text-decoration:line-through;}
@@ -258,7 +259,7 @@
                     sale = item.price - item.price * (item.sales.discount.slice(0, item.sales.discount.length -1) / 100);
                 }
 
-                return `<div class="item_project">
+                return `<div class="item_project" >
                             <img src="${item.img}" alt="${item.title}">
                             <strong>
                                 <span class="txt_brand">${item.brand}</span>
@@ -359,11 +360,28 @@
             if(txtBrand == '' || txtProduct == ''){
                 alert('검색하고 싶은 브랜드명/제품명을 입력해주세요');
             }else{
+                // on 제거 초기화
+                const itemProject = document.querySelectorAll('.item_project');
+                itemProject.forEach(el => el.classList.remove('on'));
+
+                // 필터링 적용
                 filterData(item => {
                     const brand = item.brand.toLowerCase();
                     const product = item.title.toLowerCase();
                     return txtBrand.toLowerCase() == brand && product.includes(txtProduct);
                 });
+
+                // view 이후 on 추가 (동기적 실행)
+                setTimeout(() => {
+                    itemProject.forEach(el => {
+                        const brand = el.querySelector('.txt_brand').textContent.toLowerCase();
+                        const product = el.querySelector('.txt_title').textContent.toLowerCase();
+
+                        if (brand === txtBrand && product.includes(txtProduct)) {
+                            el.classList.add('on');
+                        }
+                    });
+                }, 0);
             }
         }
 
