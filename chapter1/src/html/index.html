@@ -21,11 +21,12 @@
 <body>
     <div class="sort">
         <div class="box_button">
-            <button class="btn_all">전체 보기</button>
+            <button class="btn_comm" data-btntype="all">전체 보기</button>
             <br />
-            <button class="btn_lg">LG만 보기</button>
+            <button class="btn_comm" data-btntype="lg">LG만 보기</button>
             <br />
-            <button class="btn_phone">휴대전화 제품 보기</button>
+            <button class="btn_comm" data-btntype="phone">휴대전화 제품 보기</button>
+            <button class="btn_reset">초기화</button>
         </div>
         <div class="box_button">
             <strong>브랜드</strong>
@@ -47,11 +48,11 @@
                 <option value="휴대전화">휴대전화</option>
                 <option value="노트북">노트북</option>
             </select>
-            <button class="btn_search">검색</button>
+            <button class="btn_comm" data-btntype="search">검색</button>
         </div>
-        <strong>가격 직접입력</strong><input type="text" class="ip_min"> ~ <input type="text" class="ip_max"> <button class="btn_price">가격 제품 보기</button>
+        <strong>가격 직접입력</strong><input type="text" class="ip_comm ip_min" data-pricetype="min"> ~ <input type="text" class="ip_comm ip_max" data-pricetype="max"> <button class="btn_comm" data-btntype="price">가격 제품 보기</button>
         <br />
-        <strong>브랜드 && 제품명 직접입력</strong><input type="text" class="ip_brand"> && <input type="text" class="ip_product"> <button class="btn_product">제품 보기</button>
+        <strong>브랜드 && 제품명 직접입력</strong><input type="text" class="ip_brand"> && <input type="text" class="ip_product"> <button class="btn_comm" data-btntype="product">제품 보기</button>
     </div>
 
     <div class="app">
@@ -235,17 +236,7 @@
                     "img" : "https://www.apple.com/kr/macbook-air/images/overview/switchers/new_mac_can_take_it__fivaqh94qmuu_medium_2x.jpg"
                 }
             ]
-        }
-
-        // 전역 변수 선언
-        const btnAll = document.querySelector('.btn_all');
-        const btnLg = document.querySelector('.btn_lg');
-        const btnPhone = document.querySelector('.btn_phone');
-        const btnPrice = document.querySelector('.btn_price');
-        const btnProduct = document.querySelector('.btn_product');
-        const btnSearch = document.querySelector('.btn_search');
-        const ipMin = document.querySelector('.ip_min');
-        const ipMax = document.querySelector('.ip_max');
+        }        
 
         // 리스트 출력
         function view(dataList = data.list){
@@ -313,6 +304,7 @@
             let filterDataList = data.list.filter(rule);
             
             if(filterDataList.length == 0){
+                reset();
                 alert('일치하는 검색 결과가 없습니다');
                 filterDataList = data.list;
             }
@@ -321,22 +313,18 @@
         
         // 숫자만 입력
         function numberChk(e){
-            const keyCode = e.keyCode;
-            const okKeyCode = [8, 9, 13, 16, 37, 39, 46]; // backspace, tab, enter, shift, arrow left, arrow right, delete
-
-            if((keyCode < 48 || keyCode > 57) && !okKeyCode.includes(keyCode)){
-                alert('숫자만 입력 가능합니다');
-                e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                e.preventDefault();
-            }
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
         }
 
         // 가격 검색
         function priceChk(){
+            const ipMin = document.querySelector('.ip_min');
+            const ipMax = document.querySelector('.ip_max');
             const min = Number(ipMin.value);
             const max = Number(ipMax.value);
             
             if(min <= 0 || max <= 0){
+                reset();
                 alert('검색하고 싶은 최소/최대 가격을 0이상으로 입력해주세요');
             }else{
                 if(min < max){
@@ -345,6 +333,7 @@
                         return salePrice >= min && salePrice <= max;
                     });
                 }else{
+                    reset();
                     alert('최소가격이 최대가격보다 작게 입력해주세요');
                 }
             }
@@ -358,6 +347,7 @@
             const txtProduct = ipProduct.value;
 
             if(txtBrand == '' || txtProduct == ''){
+                reset();
                 alert('검색하고 싶은 브랜드명/제품명을 입력해주세요');
             }else{
                 // on 제거 초기화
@@ -391,6 +381,7 @@
             const ipProduct = document.querySelector('.ip_select[data-select="product"]');
             
             if(ipBrand.value == '' || ipProduct.value == ''){
+                reset();
                 alert('검색하고 싶은 브랜드명/제품명을 선택해주세요');
             }else{
                 filterData(item => {
@@ -401,6 +392,12 @@
             }
         }
 
+        // 버튼 reset
+        function reset(){
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            document.querySelectorAll('select').forEach(select => select.value = '');
+        }
+
         // 초기화
         function init(){
             view();
@@ -409,32 +406,21 @@
 
         // 이벤트 연결
         function bindEvents(){
-            btnAll.addEventListener('click', () => {
-                filterFn('all');
+            const btnComm = document.querySelectorAll('.btn_comm');
+            btnComm.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filterType = btn.dataset.btntype;
+                    filterFn(filterType);
+                });
             });
 
-            btnLg.addEventListener('click', () => {
-                filterFn('lg');
+            const ipComm = document.querySelectorAll('.ip_comm');
+            ipComm.forEach(ip => {
+                ip.addEventListener('input', numberChk);
             });
 
-            btnPhone.addEventListener('click', () => {
-                filterFn('phone');
-            });
-
-            btnPrice.addEventListener('click', () => {
-                filterFn('price');
-            });
-
-            btnProduct.addEventListener('click', () => {
-                filterFn('product');
-            });
-
-            btnSearch.addEventListener('click', () => {
-                filterFn('search');
-            });
-            
-            ipMin.addEventListener('keydown', numberChk);
-            ipMax.addEventListener('keydown', numberChk);
+            const btnReset = document.querySelector('.btn_reset');
+            btnReset.addEventListener('click', reset);
         }
 
         document.addEventListener('DOMContentLoaded', init);
