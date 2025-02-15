@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+    <style>
+        *{margin:0; padding:0;}
+        .app{padding:20px;}
+        .prod-list img, .prod-list strong, .prod-list del, .prod-list span, .prod-list em{margin:0 10px 0 0;}
+        .prod-list{border-top:1px solid green}
+        .prod-list li{display:flex; padding:10px; border-bottom:1px solid green}
+        .prod-list li img{display:block; width:100px; height:100%}
+
+        .filter{padding:20px; margin:0 0 30px; border:1px solid orange; border-radius:5px;}
+        div.search{padding:20px 0 0 0;}
+        span.keyword{margin:0; color:red;}
+    </style>
+
+    <div class="app"></div>
+
+    <script>
+        const data = {
+            "name" : "가전제품 목록",
+            "description" : "가전제품 가전제품",
+            "list" : [
+                {
+                    "brand" : "LG",
+                    "title" : "TV",
+                    "price" : "2200000",
+                    "sales" : {
+                        "state" : false,
+                        "discount" : "10%"
+                    }
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "전자렌지",
+                    "price" : "190000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "15%"
+                    }
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "청소기",
+                    "price" : "660000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "10%"
+                    }
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "공기청정기",
+                    "price" : "1300000",
+                    "sales" : {
+                        "state" : false,
+                        "discount" : "15%"
+                    }
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "가습기",
+                    "price" : "1400000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "5%"
+                    }
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "휴대전화",
+                    "price" : "1000000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "15%"
+                    }
+                },
+                {
+                    "brand" : "LG",
+                    "title" : "노트북",
+                    "price" : "1800000",
+                    "sales" : {
+                        "state" : false,
+                        "discount" : "15%"
+                    }
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "TV",
+                    "price" : "3000000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "7%"
+                    }
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "전자렌지",
+                    "price" : "160000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "7%"
+                    }
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "청소기",
+                    "price" : "820000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "12%"
+                    }
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "공기청정기",
+                    "price" : "400000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "5%"
+                    }
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "가습기",
+                    "price" : "340000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "10%"
+                    }
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "휴대전화",
+                    "price" : "1600000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "20%"
+                    }
+                },
+                {
+                    "brand" : "삼성",
+                    "title" : "노트북",
+                    "price" : "1350000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "15%"
+                    }
+                },
+                {
+                    "brand" : "애플",
+                    "title" : "휴대전화",
+                    "price" : "1700000",
+                    "sales" : {
+                        "state" : false,
+                        "discount" : "15%"
+                    }
+                },
+                {
+                    "brand" : "애플",
+                    "title" : "노트북",
+                    "price" : "3500000",
+                    "sales" : {
+                        "state" : true,
+                        "discount" : "1%"
+                    }
+                }
+            ]
+        }
+
+        const create = (config) => {
+            const obj = document.createElement(config.tag);
+            if(config.classname) obj.classList.add(config.classname);
+            if(config.value) obj.textContent = config.value;
+            return obj;
+        }
+
+        const elements = {
+            id : function(obj){return document.getElementById(obj)},
+            select : function(obj){return document.querySelector(obj)},
+            selectAll : function(obj){return document.querySelectorAll(obj)},
+            app : document.querySelector('.app'),
+            set : function(){
+                const filter = create({'tag' : 'fieldset', 'classname' : 'filter'});
+                const list = create({'tag' : 'div', 'classname' : 'list'});
+                const h1 = create({'tag' : 'h1', 'value' : data.name});
+                const h2 = create({'tag' : 'h2', 'value' : data.description});
+
+                this.app.append(h1, filter, list);
+            }
+        }
+
+        const images = {
+            get : async function(query){
+                const key = '6b56dedb51c33972091cfb421b60e952';
+                const url = `https://dapi.kakao.com/v2/search/image?query=${encodeURIComponent(query)}&sort=accuracy&page=1&size=1`;
+                try {
+                    const data = await fetch(url, {
+                        method : 'GET',
+                        headers : {'Authorization': `KakaoAK ${key}`}
+                    }).then(response => response.json());
+                    return data.documents[0].image_url;
+                }
+                catch (error) {
+                    console.error('error:', error);
+                }
+            },
+            set : async function(data){
+                const update = await Promise.all(
+                    data.map(async (item) => {
+                        const url = await this.get(`${item.brand} ${item.title}`);
+                        return { ...item, image: url };
+                    })
+                );
+                //console.log(update);
+                return update;
+            }
+        }
+
+        const grid = {
+            reset : function(config){
+                elements.select(config.element).replaceChildren();
+            },
+            draw : function(data, highlight = false){
+                this.reset({'element' : '.list'});
+
+                const list = create({'tag' : 'ul', 'classname' : 'prod-list'});
+                data.forEach(item => {
+                    const li = create({'tag' : 'li', 'classname' : 'prod-item'});
+                    const image = create({'tag' : 'img', 'classname' : 'prod-image'});
+                    const brand = create({'tag' : 'em', 'classname' : 'prod-brand', 'value' : item.brand});
+                    const title = create({'tag' : 'strong', 'classname' : 'prod-title', 'value' : item.title});
+
+                    image.setAttribute('src', item.image);
+
+
+                    brand.innerHTML = highlight ? item.brandHighlight : item.brand;
+                    title.innerHTML = highlight ? item.titleHighlight : item.title;
+
+                    
+                    li.append(image, brand, title);
+
+                    if(item.sales.state){
+                        const discount = create({'tag' : 'span', 'classname' : 'prod-discount-price', 'value' : `판매가 : ${item.price*(1-parseFloat(item.sales.discount) / 100)}`});
+                        const price = create({'tag' : 'del', 'classname' : 'prod-orignal-price', 'value' : `정상가 : ${item.price}`});
+                        li.append(price, discount)
+                    }
+                    else{
+                        const price = create({'tag' : 'span', 'classname' : 'prod-price', 'value' : `판매가 : ${item.price}`});
+                        li.append(price);
+                    }
+
+                    list.appendChild(li);
+                })
+                elements.select('.list').appendChild(list);
+            }
+        }
+        
+        const filter = {
+            reset : () => {
+                elements.id('brand').value = '';
+                elements.id('title').value = '';
+                elements.id('min-price').value = '';
+                elements.id('max-price').value = '';
+                elements.selectAll('select').forEach((selectbox) => {
+                    selectbox.value = 'all';
+                });
+            },
+            align : () => {
+                const brand = elements.id('brand').value;
+                const title = elements.id('title').value;
+                const min = elements.id('min-price');
+                const max = elements.id('max-price');
+
+                if (!min.value || !max.value || !/^\d+$/.test(min.value) || !/^\d+$/.test(max.value)) {
+                    alert('가격 제대로 넣어라');
+                    (!min.value ? min : max).focus();
+                    return;
+                }
+
+                if (parseInt(min.value) > parseInt(max.value)) {
+                    alert('최대 가격이 최소가격보다 작다');
+                    max.value = '';
+                    max.focus();
+                    return;
+                }
+
+                const list = data.list.filter(item => {
+                    const price = item.sales.state ? item.price * (1 - parseFloat(item.sales.discount) / 100) : item.price;
+                    return (brand === 'all' || item.brand === brand) && (title === 'all' || item.title === title) && price >= parseInt(min.value) && price <= parseInt(max.value)
+                });
+                
+                list.length > 0 ? grid.draw(list) : elements.select('.list').innerHTML = '결과 없음';
+            }
+        }
+        
+        const search = {
+            draw : function(config){
+                const field = create({'tag' : 'div', 'classname': 'search'});
+                const input = create({'tag' : 'input', 'classname': 'keyword'});
+                const button = create({'tag' : 'button', 'classname': 'query', 'value': '검색'});
+
+                input.id = 'query'
+                input.setAttribute('type', 'text');
+                input.setAttribute('placeholder', '브랜드 또는 제품명 검색');
+                
+                field.append(input, button);
+                elements.select(config.element).appendChild(field);
+
+                button.addEventListener('click', () => {
+                    const query = input.value.trim();
+                    this.highlight(query);
+                });
+            },
+            write : function(text, query){
+                const regex = new RegExp(`(${query})`, "gi");
+                return text.replace(regex, '<span class="keyword">$1</span>');
+            },
+            highlight : function(query){
+                if(!query){
+                    alert('검색어 없음');
+                    return;
+                }
+
+                const result = data.list.filter((item) => item.brand.toLowerCase().includes(query.toLowerCase()) || item.title.toLowerCase().includes(query.toLowerCase()));
+
+                if(result.length === 0){
+                    elements.select('.list').innerHTML = '결과 없음'
+                }
+                else{
+                    const update = result.map((item) => {
+                        return {
+                            ...item,
+                            brandHighlight : this.write(item.brand, query),
+                            titleHighlight : this.write(item.title, query),
+                        };
+                    });
+                    filter.reset();
+                    grid.draw(update, true);
+                }
+            }
+        }
+
+        const setFilter = {
+            setSelectBox : function(data, name){
+                const selectbox = create({'tag' : 'select', 'classname' : name});
+                const options = ['전체보기', ...new Set(data)];
+                selectbox.id = name;
+                options.forEach(item => {
+                    const opts = create({'tag' : 'option'});
+                    opts.value = item === '전체보기' ? 'all' : item;
+                    opts.textContent = item;
+                    selectbox.appendChild(opts);
+                })
+                return selectbox;
+            },
+            draw : function(obj){
+                const brand = this.setSelectBox(data.list.map(item => item.brand), 'brand');
+                const title = this.setSelectBox(data.list.map(item => item.title), 'title');
+                const min = create({'tag' : 'input', 'classname' : 'min-price'});
+                const max = create({'tag' : 'input', 'classname' : 'max-price'});
+                const buttons = create({'tag' : 'button', 'classname' : 'search', 'value' : '검색'});
+
+                [min, max].forEach((input, index) => {
+                    input.setAttribute('type', 'number');
+                    input.setAttribute('id', index === 0 ? 'min-price' : 'max-price');
+                    input.setAttribute('value', index === 0 ? '10' : '5000000');
+                });
+
+                if(elements.select(obj.element)){
+                    elements.select(obj.element).append(brand, title, min, max, buttons);
+                    buttons.addEventListener('click', filter.align);
+                }
+                else{
+                    console.log('loading...')
+                    return;
+                }
+            }
+        }
+
+        const process = async () => {
+            data.list = await images.set(data.list);
+            grid.draw(data.list);
+        };
+
+        elements.set();
+        setFilter.draw({'element' : '.filter'})
+        search.draw({'element' : '.filter'})
+        
+        process();
+    </script>
+</body>
+</html>
