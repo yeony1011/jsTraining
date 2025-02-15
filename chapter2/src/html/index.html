@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .tf_comm{display:block;width:300px;height:100px;}
+    .wrap_layer{position:absolute;top:50%;left:50%;width:300px;height:100px;border:1px solid;transform:translate(-50%, -50%)}
+    .wrap_layer .btn_close{position:absolute;top:0;right:0;}
+    .wrap_toast{position:absolute;bottom:50px;left:50%;width:300px;height:50px;border:1px solid;transform:translateX(-50%)}
+  </style>
+</head>
+<body>
+  <div class="app"></div>
+
+  <script>
+    // 동적 생성
+    const app = document.querySelector('.app');
+    const tfComm = document.createElement('textarea');
+    const btnAlert = document.createElement('button');
+    const btnLayer = document.createElement('button');
+    const btnToast = document.createElement('button');
+    const btnClose = document.createElement('button');
+    const layer = document.createElement('div');
+    const toast = document.createElement('div');
+
+    // 초기화
+    tfComm.setAttribute('class', 'tf_comm');
+    tfComm.setAttribute('maxlength', '10');
+    
+    btnAlert.setAttribute('class', 'btn_alert');
+    btnAlert.textContent = 'alert';
+    
+    btnLayer.setAttribute('class', 'btn_layer');
+    btnLayer.textContent = 'layer';
+    
+    btnToast.setAttribute('class', 'btn_toast');
+    btnToast.textContent = 'toast';
+
+    btnClose.setAttribute('class', 'btn_close');
+    btnClose.textContent = 'close';
+    
+    layer.setAttribute('class', 'wrap_layer');
+    toast.setAttribute('class', 'wrap_toast');
+
+
+    // 동적 추가
+    app.append(tfComm, btnAlert, btnLayer, btnToast);
+
+    // alert
+    btnAlert.addEventListener('click', function(){
+      if(tfComm.value != ''){
+        alert(tfComm.value);
+      }else{
+        alert('값이 비어있습니다');
+      }
+    });
+
+    // layer
+    btnLayer.addEventListener('click', function(){
+      if(tfComm.value != ''){
+        layer.textContent = tfComm.value;
+        layer.appendChild(btnClose);
+        app.append(layer);
+      }else{
+        alert('값이 비어있습니다');
+      }
+    });
+
+    // layer close
+    btnClose.addEventListener('click', function(){
+      layer.remove();
+    });
+
+    // toast
+    btnToast.addEventListener('click', function(){
+      if(tfComm.value != ''){
+        toast.textContent = tfComm.value;
+        app.append(toast);
+        setTimeout(() => toast.remove(), 5000);
+      }else{
+        alert('값이 비어있습니다');
+      }
+    });
+  </script>
+</body>
+</html>
