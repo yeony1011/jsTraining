@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="app"></div>
+  <script>
+    const app = document.querySelector('.app');
+
+    function createElements(tag, className, textCont, attr){
+      const element = document.createElement(tag);
+      element.classList.add(className);
+      if(textCont && typeof textCont === 'string'){
+        element.textContent = textCont;
+      }
+      if(attr && typeof attr === 'object'){
+        for(let key in attr){
+          element.setAttribute(key, attr[key]);
+        }
+      }
+      return element;
+    }
+
+    // UI 생성
+    const tfComm = createElements('textarea', 'tf_comm', '', {maxlength: '10'});
+    const btnAlert = createElements('button', 'btn_alert', 'alert');
+    const btnLayer = createElements('button', 'btn_layer', 'layer');
+    const btnToast = createElements('button', 'btn_toast', 'toast');
+    const btnClose = createElements('button', 'btn_close', 'close');
+    const layer = createElements('div', 'wrap_layer');
+    const toast = createElements('div', 'wrap_toast');
+
+    // 반값 체크
+    const isEmpty = (element) => {
+      if(element.value == ''){
+        alert('값이 비어있습니다');
+        return false;
+      }else{
+        return true;
+      }
+    }
+
+    const changeURL = (textCont, textValue) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // const age = urlParams.get("age");
+      // document.getElementById("ageDisplay").textContent = `Age: ${age}`;
+      
+      // const getalert = urlParams.get('alert');
+      // getalert ? tfComm.value = getalert : tfComm.value = textValue;
+      // tfComm.value = getalert;
+
+      // urlParams.set(textCont, textValue);
+      // window.history.replaceState({}, '', `?${urlParams.toString()}`);
+
+      const getalert = urlParams.get('alert');
+      const getlayer = urlParams.get('layer');
+      const gettoast = urlParams.get('toast');
+
+      console.log(textCont, textValue, getalert); // alert d
+
+
+      // if(textCont == 'alert'){
+      //   alert(textValue);
+      // }
+
+      // }else if(textCont == 'layer'){
+      //   layer.textContent = value;
+      //   layer.appendChild(btnClose);
+      //   app.append(layer);
+      // }else if(textCont == 'toast'){
+      //   toast.textContent = value;
+      //   app.append(toast);
+      //   setTimeout(() => toast.remove(), 5000);
+      // }
+    }
+
+    btnAlert.addEventListener('click', function(){
+      if(isEmpty(tfComm) == true){
+        changeURL('alert', tfComm.value);
+      }
+    });
+
+    // layer
+    btnLayer.addEventListener('click', function(){
+      if(isEmpty(tfComm) == true){
+        changeURL('layer', tfComm.value);
+      }
+    });
+
+    // layer close
+    btnClose.addEventListener('click', function(){
+      layer.remove();
+    });
+
+    // toast
+    btnToast.addEventListener('click', function(){
+      if(isEmpty(tfComm) == true){
+        changeURL('toast', tfComm.value);
+      }
+    });
+
+    window.addEventListener('popstate', changeURL);
+    // 초기 로딩 시 한 번 값 설정
+    document.addEventListener('DOMContentLoaded', changeURL);
+
+    app.append(tfComm, btnAlert, btnLayer, btnToast);
+  </script>
+</body>
+</html>

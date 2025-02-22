@@ -13,11 +13,13 @@
 </head>
 <body>
   <div class="app"></div>
+
   <script>
     const app = document.querySelector('.app');
+    let urlPrev = new URLSearchParams(window.location.search);
 
     // 동적 생성
-    const createElements = (tag, className, textCont, attr) => {
+    function createElements(tag, className, textCont, attr){
       const element = document.createElement(tag);
       element.classList.add(className);
       if(textCont && typeof textCont === 'string'){
@@ -42,7 +44,7 @@
 
     // 반값 체크
     const isEmpty = (element) => {
-      if(!element.value.trim()){
+      if(element.value == ''){
         alert('값이 비어있습니다');
         return false;
       }else{
@@ -51,61 +53,94 @@
     }
 
     // UI 변경 체크
-    const isChangeUI = (type, message) => {
+    const isChangeUI = (textCont) => {
       const url = new URLSearchParams(window.location.search);
       
-      url.set('message', message);
-      url.set('type', type);
-      
+      url.set(textCont, tfComm.value);
       window.history.replaceState({}, '', `?${url.toString()}`);
-      updateUI(type, message);
+      updateURL();
     }
 
-    // URL 변경 체크
+
     const isChangeURL = () => {
       const url = new URLSearchParams(window.location.search);
-      const type = url.get('type');
-      const message = url.get('message');
+      const getalert = url.get('alert');
+      const getlayer = url.get('layer');
+      const gettoast = url.get('toast');
 
-      tfComm.value = message;
-      updateUI(type, message);
+      console.log(getalert, getlayer, gettoast);
+    }
+    
+
+    // URL 변경 체크
+    updateURL = () => {
+      const urlCurrent = new URLSearchParams(window.location.search);
+      let updated = false;
+
+      urlCurrent.forEach((value, key) => {
+        if(urlPrev.get(key) != value){
+          // console.log(`쿼리변경 : ${key}=${value}`);
+          updateUI(key, value);
+          updated = true;
+        }
+      });
+
+      if(updated){
+        urlPrev = new URLSearchParams(window.location.search);
+      }
     }
 
     // UI 변경 적용
-    const updateUI = (type, message) => {
-      tfComm.value = message;
+    const updateUI = (textCont, value) => {
+      tfComm.value = value;
 
-      if(type === 'alert'){
-        alert(message);
-      }else if(type === 'layer'){
-        layer.textContent = message;
+      if(textCont == 'alert'){
+        alert(value);
+      }else if(textCont == 'layer'){
+        layer.textContent = value;
         layer.appendChild(btnClose);
         app.append(layer);
-      }else if(type === 'toast'){
-        toast.textContent = message;
+      }else if(textCont == 'toast'){
+        toast.textContent = value;
         app.append(toast);
         setTimeout(() => toast.remove(), 5000);
       }
     }
 
-    const addEvents = (button, type) => {
-      button.addEventListener('click', function(){
-        if(isEmpty(tfComm) == true){
-          isChangeUI(type, tfComm.value);
-        }
-      });
-    };
+    // URL 변경 감지 이벤트
+    window.addEventListener('popstate', isChangeUI);
+    // document.addEventListener("DOMContentLoaded", isChangeUI);
 
-    addEvents(btnAlert, 'alert');
-    addEvents(btnLayer, 'layer');
-    addEvents(btnToast, 'toast');
+    // alert
+    btnAlert.addEventListener('click', function(){
+      if(isEmpty(tfComm) == true){
+        isChangeUI('alert');
+      }
+    });
+
+    // layer
+    btnLayer.addEventListener('click', function(){
+      if(isEmpty(tfComm) == true){
+        isChangeUI('layer');
+      }
+    });
 
     // layer close
-    btnClose.addEventListener('click', () => layer.remove());
+    btnClose.addEventListener('click', function(){
+      layer.remove();
+    });
+
+    // toast
+    btnToast.addEventListener('click', function(){
+      if(isEmpty(tfComm) == true){
+        isChangeUI('toast');
+      }
+    });
 
     // 동적 추가
     app.append(tfComm, btnAlert, btnLayer, btnToast);
-    isChangeURL();
+    updateURL();
+    
   </script>
 </body>
 </html>
