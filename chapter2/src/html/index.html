@@ -14,98 +14,108 @@
 <body>
   <div class="app"></div>
   <script>
-    const app = document.querySelector('.app');
+    const App = {
+      init: function() {
+        this.app = document.querySelector('.app');
 
-    // 동적 생성
-    const createElements = (tag, className, textCont, attr) => {
-      const element = document.createElement(tag);
-      element.classList.add(className);
-      if(textCont && typeof textCont === 'string'){
-        element.textContent = textCont;
-      }
-      if(attr && typeof attr === 'object'){
-        for(let key in attr){
-          element.setAttribute(key, attr[key]);
+        // UI 생성
+        this.tfComm = this.createElements('textarea', 'tf_comm', '', {maxlength: '10'});
+        this.btnAlert = this.createElements('button', 'btn_alert', 'alert');
+        this.btnLayer = this.createElements('button', 'btn_layer', 'layer');
+        this.btnToast = this.createElements('button', 'btn_toast', 'toast');
+        this.btnClose = this.createElements('button', 'btn_close', 'close');
+        this.layer = this.createElements('div', 'wrap_layer');
+        this.toast = this.createElements('div', 'wrap_toast');
+
+        this.append();
+        this.isChangeURL();
+      },
+
+      // 동적 생성
+      createElements: function(tag, className, textCont, attr) {
+        const element = document.createElement(tag);
+        element.classList.add(className);
+        if(textCont && typeof textCont === 'string'){
+          element.textContent = textCont;
         }
-      }
-      return element;
-    }
-
-    // UI 생성
-    const tfComm = createElements('textarea', 'tf_comm', '', {maxlength: '10'});
-    const btnAlert = createElements('button', 'btn_alert', 'alert');
-    const btnLayer = createElements('button', 'btn_layer', 'layer');
-    const btnToast = createElements('button', 'btn_toast', 'toast');
-    const btnClose = createElements('button', 'btn_close', 'close');
-    const layer = createElements('div', 'wrap_layer');
-    const toast = createElements('div', 'wrap_toast');
-
-    // 반값 체크
-    const isEmpty = (element) => {
-      if(!element.value.trim()){
-        alert('값이 비어있습니다');
-        return false;
-      }else{
-        return true;
-      }
-    }
-
-    // UI 변경 체크
-    const isChangeUI = (type, message) => {
-      const url = new URLSearchParams(window.location.search);
-      
-      url.set('message', message);
-      url.set('type', type);
-      
-      window.history.replaceState({}, '', `?${url.toString()}`);
-      updateUI(type, message);
-    }
-
-    // URL 변경 체크
-    const isChangeURL = () => {
-      const url = new URLSearchParams(window.location.search);
-      const type = url.get('type');
-      const message = url.get('message');
-
-      tfComm.value = message;
-      updateUI(type, message);
-    }
-
-    // UI 변경 적용
-    const updateUI = (type, message) => {
-      tfComm.value = message;
-
-      if(type === 'alert'){
-        alert(message);
-      }else if(type === 'layer'){
-        layer.textContent = message;
-        layer.appendChild(btnClose);
-        app.append(layer);
-      }else if(type === 'toast'){
-        toast.textContent = message;
-        app.append(toast);
-        setTimeout(() => toast.remove(), 5000);
-      }
-    }
-
-    const addEvents = (button, type) => {
-      button.addEventListener('click', function(){
-        if(isEmpty(tfComm) == true){
-          isChangeUI(type, tfComm.value);
+        if(attr && typeof attr === 'object'){
+          for(let key in attr){
+            element.setAttribute(key, attr[key]);
+          }
         }
-      });
+        return element;
+      },
+
+      // 빈값 체크
+      isEmpty: function(element) {
+        if(!element.value.trim()){
+          alert('값이 비어있습니다');
+          return false;
+        }else{
+          return true;
+        }
+      },
+
+      // UI 변경 체크
+      isChangeUI: function(type, message) {
+        const url = new URLSearchParams(window.location.search);
+        
+        url.set('message', message);
+        url.set('type', type);
+        
+        window.history.replaceState({}, '', `?${url.toString()}`);
+        this.updateUI(type, message);
+      },
+
+      // URL 변경 체크
+      isChangeURL: function() {
+        const url = new URLSearchParams(window.location.search);
+        const type = url.get('type');
+        const message = url.get('message');
+
+        this.tfComm.value = message;
+        this.updateUI(type, message);
+      },
+
+      // UI 변경 적용
+      updateUI: function(type, message) {
+        this.tfComm.value = message;
+
+        if(type === 'alert'){
+          alert(message);
+        }else if(type === 'layer'){
+          this.layer.textContent = message;
+          this.layer.appendChild(this.btnClose);
+          this.app.append(this.layer);
+        }else if(type === 'toast'){
+          this.toast.textContent = message;
+          this.app.append(this.toast);
+          setTimeout(() => this.toast.remove(), 5000);
+        }
+      },
+
+      // 이벤트 연결
+      addEvents: function(button, type) {
+        button.addEventListener('click', () => {
+          if(this.isEmpty(this.tfComm) == true){
+            this.isChangeUI(type, this.tfComm.value);
+          }
+        });
+      },
+
+      // 동적 추가
+      append: function() {
+        this.app.append(this.tfComm, this.btnAlert, this.btnLayer, this.btnToast);
+
+        this.addEvents(this.btnAlert, 'alert');
+        this.addEvents(this.btnLayer, 'layer');
+        this.addEvents(this.btnToast, 'toast');
+
+        this.btnClose.addEventListener('click', () => this.layer.remove());
+      }
     };
-
-    addEvents(btnAlert, 'alert');
-    addEvents(btnLayer, 'layer');
-    addEvents(btnToast, 'toast');
-
-    // layer close
-    btnClose.addEventListener('click', () => layer.remove());
-
-    // 동적 추가
-    app.append(tfComm, btnAlert, btnLayer, btnToast);
-    isChangeURL();
+    
+    App.init();
   </script>
 </body>
 </html>

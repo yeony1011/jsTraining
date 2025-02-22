@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .tf_comm{display:block;width:300px;height:100px;}
+    .wrap_layer{position:absolute;top:50%;left:50%;width:300px;height:100px;border:1px solid;transform:translate(-50%, -50%)}
+    .wrap_layer .btn_close{position:absolute;top:0;right:0;}
+    .wrap_toast{position:absolute;bottom:50px;left:50%;width:300px;height:50px;border:1px solid;transform:translateX(-50%)}
+  </style>
+</head>
+<body>
+  <div class="app"></div>
+  <script>
+    const app = document.querySelector('.app');
+
+    // 동적 생성
+    const createElements = (tag, className, textCont, attr) => {
+      const element = document.createElement(tag);
+      element.classList.add(className);
+      if(textCont && typeof textCont === 'string'){
+        element.textContent = textCont;
+      }
+      if(attr && typeof attr === 'object'){
+        for(let key in attr){
+          element.setAttribute(key, attr[key]);
+        }
+      }
+      return element;
+    }
+
+    // UI 생성
+    const tfComm = createElements('textarea', 'tf_comm', '', {maxlength: '10'});
+    const btnAlert = createElements('button', 'btn_alert', 'alert');
+    const btnLayer = createElements('button', 'btn_layer', 'layer');
+    const btnToast = createElements('button', 'btn_toast', 'toast');
+    const btnClose = createElements('button', 'btn_close', 'close');
+    const layer = createElements('div', 'wrap_layer');
+    const toast = createElements('div', 'wrap_toast');
+
+    // 반값 체크
+    const isEmpty = (element) => {
+      if(!element.value.trim()){
+        alert('값이 비어있습니다');
+        return false;
+      }else{
+        return true;
+      }
+    }
+
+    // UI 변경 체크
+    const isChangeUI = (type, message) => {
+      const url = new URLSearchParams(window.location.search);
+      
+      url.set('message', message);
+      url.set('type', type);
+      
+      window.history.replaceState({}, '', `?${url.toString()}`);
+      updateUI(type, message);
+    }
+
+    // URL 변경 체크
+    const isChangeURL = () => {
+      const url = new URLSearchParams(window.location.search);
+      const type = url.get('type');
+      const message = url.get('message');
+
+      tfComm.value = message;
+      updateUI(type, message);
+    }
+
+    // UI 변경 적용
+    const updateUI = (type, message) => {
+      tfComm.value = message;
+
+      if(type === 'alert'){
+        alert(message);
+      }else if(type === 'layer'){
+        layer.textContent = message;
+        layer.appendChild(btnClose);
+        app.append(layer);
+      }else if(type === 'toast'){
+        toast.textContent = message;
+        app.append(toast);
+        setTimeout(() => toast.remove(), 5000);
+      }
+    }
+
+    const addEvents = (button, type) => {
+      button.addEventListener('click', function(){
+        if(isEmpty(tfComm) == true){
+          isChangeUI(type, tfComm.value);
+        }
+      });
+    };
+
+    addEvents(btnAlert, 'alert');
+    addEvents(btnLayer, 'layer');
+    addEvents(btnToast, 'toast');
+
+    // layer close
+    btnClose.addEventListener('click', () => layer.remove());
+
+    // 동적 추가
+    app.append(tfComm, btnAlert, btnLayer, btnToast);
+    isChangeURL();
+  </script>
+</body>
+</html>
