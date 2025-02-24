@@ -19,32 +19,56 @@
         this.app = document.querySelector('.app');
 
         // UI 생성
-        this.tfComm = this.createElements('textarea', 'tf_comm', {maxlength: '10'});
-        this.btnAlert = this.createElements('button', 'btn_alert', 'alert');
-        this.btnLayer = this.createElements('button', 'btn_layer', 'layer');
-        this.btnToast = this.createElements('button', 'btn_toast', 'toast');
-        this.btnClose = this.createElements('button', 'btn_close', 'close');
-        this.layer = this.createElements('div', 'wrap_layer');
-        this.toast = this.createElements('div', 'wrap_toast');
+        // [방법2]
+        this.tfComm = this.createElements({'tag': 'textarea', 'className': 'tf_comm', 'attr': {maxlength: '10'}});
+        this.btnAlert = this.createElements({'tag': 'button', 'className': 'btn_alert', 'textCont': 'alert'});
+        this.btnLayer = this.createElements({'tag': 'button', 'className': 'btn_layer', 'textCont': 'layer'});
+        this.btnToast = this.createElements({'tag': 'button', 'className': 'btn_toast', 'textCont': 'toast'});
+        this.btnClose = this.createElements({'tag': 'button', 'className': 'btn_close', 'textCont': 'close'});
+        this.layer = this.createElements({'tag': 'div', 'className': 'wrap_layer'});
+        this.toast = this.createElements({'tag': 'div', 'className': 'wrap_toast'});
+        // [방법1]
+        // this.tfComm = this.createElements('textarea', 'tf_comm', {maxlength: '10'});
+        // this.btnAlert = this.createElements('button', 'btn_alert', 'alert');
+        // this.btnLayer = this.createElements('button', 'btn_layer', 'layer');
+        // this.btnToast = this.createElements('button', 'btn_toast', 'toast');
+        // this.btnClose = this.createElements('button', 'btn_close', 'close');
+        // this.layer = this.createElements('div', 'wrap_layer');
+        // this.toast = this.createElements('div', 'wrap_toast');
 
         this.append();
         this.isChangeURL();
       },
 
       // 동적 생성
-      createElements: function(tag, className, textCont = '', attr = '') {
-        const element = document.createElement(tag);
-        element.classList.add(className);
-        if(textCont && typeof textCont === 'string'){
-          element.textContent = textCont;
+      // [방법2]
+      createElements: function(config) {
+        const element = document.createElement(config.tag);
+        element.classList.add(config.className);
+        if(config.textCont){
+          element.textContent = config.textCont;
         }
-        if(attr && typeof attr === 'object'){
-          for(let key in attr){
-            element.setAttribute(key, attr[key]);
+        if(config.attr){ // or config.attr.length > 0
+          for(let key in config.attr){
+            element.setAttribute(key, config.attr[key]);
           }
         }
         return element;
       },
+      // [방법1]
+      // createElements: function(tag, className, textCont = '', attr = '') {
+      //   const element = document.createElement(tag);
+      //   element.classList.add(className);
+      //   if(textCont){
+      //     element.textContent = textCont;
+      //   }
+      //   if(attr){
+      //     for(let key in attr){
+      //       element.setAttribute(key, attr[key]);
+      //     }
+      //   }
+      //   return element;
+      // },
 
       // 빈값 체크
       isEmpty: function(element) {
