@@ -19,7 +19,7 @@
         this.app = document.querySelector('.app');
 
         // UI 생성
-        this.tfComm = this.createElements('textarea', 'tf_comm', '', {maxlength: '10'});
+        this.tfComm = this.createElements('textarea', 'tf_comm', {maxlength: '10'});
         this.btnAlert = this.createElements('button', 'btn_alert', 'alert');
         this.btnLayer = this.createElements('button', 'btn_layer', 'layer');
         this.btnToast = this.createElements('button', 'btn_toast', 'toast');
@@ -32,7 +32,7 @@
       },
 
       // 동적 생성
-      createElements: function(tag, className, textCont, attr) {
+      createElements: function(tag, className, textCont = '', attr = '') {
         const element = document.createElement(tag);
         element.classList.add(className);
         if(textCont && typeof textCont === 'string'){
@@ -50,6 +50,7 @@
       isEmpty: function(element) {
         if(!element.value.trim()){
           alert('값이 비어있습니다');
+          this.tfComm.focus();
           return false;
         }else{
           return true;
