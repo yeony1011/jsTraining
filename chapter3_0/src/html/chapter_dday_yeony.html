@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .app{display:flex;flex-wrap:wrap;padding:10px}
+    .tf_input{width:150px;padding:5px}
+    .txt_message{width:100%;margin:0;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="app"></div>
+  <script>
+    const App = {
+      init: function() {
+        this.app = document.querySelector('.app');
+
+        this.tfInput = this.createElements({'tag': 'input', 'className': 'tf_input', 'attr': {type: 'text', maxlength: '10', placeholder: 'YYYY-MM-DD'}});
+        this.btnCount = this.createElements({'tag': 'button', 'className': 'btn_count', 'textCont': '계산', 'attr': {type: 'button'}});
+        this.txtMessage = this.createElements({'tag': 'p', 'className': 'txt_message'});
+
+        this.append();
+      },
+      createElements: function(config) {
+        const element = document.createElement(config.tag);
+        element.classList.add(config.className);
+        if(config.textCont){
+          element.textContent = config.textCont;
+        }
+        if(config.attr){ // or config.attr.length > 0
+          for(let key in config.attr){
+            element.setAttribute(key, config.attr[key]);
+          }
+        }
+        return element;
+      },
+      append: function() {
+        this.app.append(this.tfInput, this.btnCount, this.txtMessage);
+        this.addEvents();
+      },
+      inputFormatting: function(){
+        let value = this.tfInput.value.replace(/[^0-9]/g, '');
+        let formattedValue = '';
+
+        if(value.trim()){
+          this.txtMessage.textContent = '';
+        }
+
+        if(value.length < 6){
+          formattedValue = value;
+        }else if(value.length < 8){
+          formattedValue = `${value.substring(0, 4)}-${value.substring(4)}`;
+        }else{
+          formattedValue = `${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6)}`;
+          this.chkValidate(formattedValue);
+        }
+        this.tfInput.value = formattedValue;
+      },
+      chkValidate: function(value){
+        const format = /^(19[7-9][0-9]|20\d{2})-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+
+        if(!format.test(value)){
+          this.txtMessage.textContent = '유효하지 않은 날짜 형식입니다';
+        }else{
+          this.txtMessage.textContent = '';
+        }
+      },
+      countDays: function(){
+        const value = this.tfInput.value;
+        
+        if(value.length == 0){
+          this.tfInput.focus();
+          this.txtMessage.textContent = '날짜를 입력하세요';
+        }else{
+          this.txtMessage.textContent = `${this.getDays({'open' : `${value} 00:00`})}`;
+        }
+      },
+      getDays: function(config){
+        const date = new Date();
+        const open = new Date(config.open.replace(' ', 'T'));
+        const distance = Math.floor((date - open) / (1000 * 60 * 60 * 24));
+
+        if(distance == 0){
+          return 'D-Day!!!';
+        }else{
+          return distance >= 0 ? `D+${distance}` : `D${distance}`;
+        }
+      },
+      addEvents: function() {
+        this.tfInput.addEventListener('input', this.inputFormatting.bind(this));
+        this.btnCount.addEventListener('click', this.countDays.bind(this));
+      },
+    };
+
+    App.init();
+  </script>
+</body>
+</html>
