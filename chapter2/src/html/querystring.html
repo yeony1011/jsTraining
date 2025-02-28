@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+    <style>
+        *{margin:0; padding:0;}
+        .message{width:500px; height:200px;}
+
+        .shadow{width:100%; height:100%; position:fixed; left:0; top:0; background:rgba(0, 0, 0, 0.7);}
+        .layer, .toast{position:fixed; left:50%; z-index:5;}
+        .layer{top:50%; padding:40px; transform:translate(-50%, -50%); background:#fff; border:1px solid #ccc;}
+        .toast{bottom:20px; padding:20px 40px; transform:translateX(-50%); background:rgba(0, 0, 0, 0.8); color:#fff; border-radius:5px;}
+        .close{display:block; position:absolute; right:0; top:0; padding:3px; color:#fff; font-size:14px;}
+    </style>
+
+    <textarea class="message"></textarea>
+    <p class="state" style="padding:50px 0;"></p>
+    <button class="btn btn_alert">alert</button>
+    <button class="btn btn_layer">layer</button>
+    <button class="btn btn_toast">toast</button>
+    <script>
+        const popup = {
+            element: (obj) => ({
+                select : document.querySelector(obj),
+                selectAll : document.querySelectorAll(obj),
+            }),
+            create : (tag, classname, value) => {
+                const obj = document.createElement(tag);
+                obj.classList.add(classname);
+                obj.textContent = value;
+                return obj;
+            },
+            params : {
+                get : () => {
+                    const url = new URLSearchParams(location.search);
+                    const mapping = ['message', 'type'];
+                    const params = {};
+                    mapping.forEach(param => {
+                        if(url.get(param)){
+                            params[param] = url.get(param);
+                            //console.log(`${param}:`, params[param]);
+                        }
+                    });
+                    return params;
+                },
+                set : (key, value) => {
+                    const url = new URL(window.location);
+                    
+                    if(value) url.searchParams.set(key, value);
+                    else url.searchParams.delete(key);
+
+                    history.replaceState({}, '', url);
+                },
+                state : (message, type) => {
+                    popup.element('.state').select.textContent = `호출 UI는 ${type} 메시지 내용은 ${message}`;
+                    
+                }
+            },
+            message : (obj, size) => {
+                const textarea = popup.element(obj).select;
+                textarea.addEventListener('input', function() {
+                    if(this.value.length > size){
+                        this.value = this.value.slice(0, size);
+                    }
+                });
+            },
+            event : (textarea) => {
+                const message = popup.element(textarea).select;
+                const buttons = popup.element('.btn').selectAll;
+                const show = {
+                    draw : (tag, className, value, timeout = 5000) => {
+                        const body = popup.element('body').select;
+                        const shadow = popup.create('div', 'shadow', '');
+                        const element = popup.create(tag, className, value);
+                        const close = popup.create('button', 'close', '닫기')
+                        body.appendChild(shadow);
+                        body.appendChild(element);
+                        element.appendChild(close);
+
+                        close.addEventListener('click', () => {
+                            shadow.style.display = 'none';
+                            element.style.display = 'none';
+                        });
+
+                        setTimeout(() => {
+                            const created = popup.element(`.shadow, .${className}`).selectAll;
+                            created.forEach(obj => {
+                                obj.style.display = 'none';
+                            })
+                        }, timeout);
+                    },
+                    alert : (value) => alert(value),
+                    layer : (value) => show.draw('div', 'layer', value),
+                    toast : (value) => show.draw('div', 'toast', value)
+                }
+
+                const params = popup.params.get();
+                if(Object.keys(params).length > 0){
+                    const text = params.message.substring(0, 20);
+                    if(params.message) message.value = text;
+                    if(params.type && show[params.type]) show[params.type](text || '');
+
+                    popup.params.state(text, params.type);
+                }
+
+                buttons.forEach(obj => {
+                    obj.addEventListener('click', function(){
+                        const value = message.value.trim();
+                        const type = [...this.classList].filter(name => name.indexOf('btn_') === 0).map(name => name.replace('btn_', ''))[0];
+                        if(!value){
+                            alert('호출 텍스트 없음');
+                            message.focus();
+                            return;
+                        }
+                        else{
+                            show[type](value);
+                            popup.params.set('message', value);
+                            popup.params.set('type', type);
+                            popup.params.state(value, type);
+                        }
+                    })
+                })
+            },
+            load : function () {
+                this.message('.message', 20);
+                this.event('.message');
+            }
+        }
+
+        popup.load();
+    </script>
+</body>
+</html>
