@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .tf_comm{display:block;width:300px;height:100px;}
+    .txt_count{font-weight:bold;color:green}
+    .txt_all{position:relative}
+    .txt_all::before{content:'/';display:inline-block;}
+    .wrap_layer{position:absolute;top:50%;left:50%;width:300px;height:100px;border:1px solid;transform:translate(-50%, -50%)}
+    .wrap_layer .btn_close{position:absolute;top:0;right:0;}
+    .wrap_toast{position:absolute;bottom:50px;left:50%;width:300px;height:50px;border:1px solid;transform:translateX(-50%)}
+  </style>
+</head>
+<body>
+  <div class="app"></div>
+  <script>
+    const App = {
+      init: function() {
+        this.app = document.querySelector('.app');
+
+        // UI 생성
+        // [방법2]
+        this.tfComm = this.createElements({'tag': 'textarea', 'className': 'tf_comm', 'attr': {maxlength: '10'}});
+        this.btnAlert = this.createElements({'tag': 'button', 'className': 'btn_alert', 'textCont': 'alert'});
+        this.btnLayer = this.createElements({'tag': 'button', 'className': 'btn_layer', 'textCont': 'layer'});
+        this.btnToast = this.createElements({'tag': 'button', 'className': 'btn_toast', 'textCont': 'toast'});
+        this.btnClose = this.createElements({'tag': 'button', 'className': 'btn_close', 'textCont': 'close'});
+        this.layer = this.createElements({'tag': 'div', 'className': 'wrap_layer'});
+        this.toast = this.createElements({'tag': 'div', 'className': 'wrap_toast'});
+        this.boxTxt = this.createElements({'tag': 'div', 'className': 'box_txt'});
+        this.txtCount = this.createElements({'tag': 'span', 'className': 'txt_count', 'textCont': '0'});
+        this.txtAll = this.createElements({'tag': 'span', 'className': 'txt_all', 'textCont': '10'});
+
+        // [방법1]
+        // this.tfComm = this.createElements('textarea', 'tf_comm', {maxlength: '10'});
+        // this.btnAlert = this.createElements('button', 'btn_alert', 'alert');
+        // this.btnLayer = this.createElements('button', 'btn_layer', 'layer');
+        // this.btnToast = this.createElements('button', 'btn_toast', 'toast');
+        // this.btnClose = this.createElements('button', 'btn_close', 'close');
+        // this.layer = this.createElements('div', 'wrap_layer');
+        // this.toast = this.createElements('div', 'wrap_toast');
+
+        this.append();
+        this.isChangeURL();
+      },
+
+      // 동적 생성
+      // [방법2]
+      createElements: function(config) {
+        const element = document.createElement(config.tag);
+        element.classList.add(config.className);
+        if(config.textCont){
+          element.textContent = config.textCont;
+        }
+        if(config.attr){ // or config.attr.length > 0
+          for(let key in config.attr){
+            element.setAttribute(key, config.attr[key]);
+          }
+        }
+        return element;
+      },
+      // [방법1]
+      // createElements: function(tag, className, textCont = '', attr = '') {
+      //   const element = document.createElement(tag);
+      //   element.classList.add(className);
+      //   if(textCont){
+      //     element.textContent = textCont;
+      //   }
+      //   if(attr){
+      //     for(let key in attr){
+      //       element.setAttribute(key, attr[key]);
+      //     }
+      //   }
+      //   return element;
+      // },
+
+      // 빈값 체크
+      isEmpty: function(element) {
+        if(!element.value.trim()){
+          alert('값이 비어있습니다');
+          this.tfComm.focus();
+          return false;
+        }else{
+          return true;
+        }
+      },
+
+      // UI 변경 체크
+      isChangeUI: function(type, message) {
+        const url = new URLSearchParams(window.location.search);
+        
+        url.set('message', message);
+        url.set('type', type);
+        
+        window.history.replaceState({}, '', `?${url.toString()}`);
+        this.updateUI(type, message);
+      },
+
+      // URL 변경 체크
+      isChangeURL: function() {
+        const url = new URLSearchParams(window.location.search);
+        const type = url.get('type');
+        const message = url.get('message');
+
+        this.tfComm.value = message;
+        this.updateUI(type, message);
+      },
+
+      // UI 변경 적용
+      updateUI: function(type, message) {
+        this.tfComm.value = message;
+
+        if(type === 'alert'){
+          alert(message);
+        }else if(type === 'layer'){
+          this.layer.textContent = message;
+          this.layer.appendChild(this.btnClose);
+          this.app.append(this.layer);
+        }else if(type === 'toast'){
+          this.toast.textContent = message;
+          this.app.append(this.toast);
+          setTimeout(() => this.toast.remove(), 5000);
+        }
+      },
+
+      // 이벤트 연결
+      addEvents: function(button, type) {
+        button.addEventListener('click', () => {
+          if(this.isEmpty(this.tfComm) == true){
+            this.isChangeUI(type, this.tfComm.value);
+          }
+        });
+
+        this.tfComm.addEventListener('input', () => {
+          console.log(this.tfComm.value.length);
+          if(this.tfComm.value.length <= 10){
+            this.txtCount.textContent = this.tfComm.value.length;
+          }
+        });
+      },
+
+      // 동적 추가
+      append: function() {
+        this.app.append(this.tfComm, this.boxTxt, this.btnAlert, this.btnLayer, this.btnToast);
+        this.boxTxt.append(this.txtCount, this.txtAll);
+
+        this.addEvents(this.btnAlert, 'alert');
+        this.addEvents(this.btnLayer, 'layer');
+        this.addEvents(this.btnToast, 'toast');
+
+        this.btnClose.addEventListener('click', () => this.layer.remove());
+      }
+    };
+    
+    App.init();
+  </script>
+</body>
+</html>
