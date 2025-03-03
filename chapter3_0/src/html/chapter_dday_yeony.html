@@ -56,6 +56,7 @@
           formattedValue = `${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6)}`;
           this.chkValidate(formattedValue);
         }
+        
         this.tfInput.value = formattedValue;
       },
       chkValidate: function(value){
@@ -73,9 +74,16 @@
         if(value.length == 0){
           this.tfInput.focus();
           this.txtMessage.textContent = '날짜를 입력하세요';
-        }else{
-          this.txtMessage.textContent = `${this.getDays({'open' : `${value} 00:00`})}`;
+          return;
         }
+
+        this.chkValidate(value);
+
+        if(this.txtMessage.textContent){
+          return;
+        }
+
+        this.txtMessage.textContent = `${this.getDays({'open' : `${value} 00:00`})}`;
       },
       getDays: function(config){
         const date = new Date();
