@@ -70,7 +70,7 @@
       },
       countDays: function(){
         const value = this.tfInput.value;
-        
+
         if(value.length == 0){
           this.tfInput.focus();
           this.txtMessage.textContent = '날짜를 입력하세요';
@@ -86,14 +86,51 @@
         this.txtMessage.textContent = `${this.getDays({'open' : `${value} 00:00`})}`;
       },
       getDays: function(config){
-        const date = new Date();
+        const today = new Date();
         const open = new Date(config.open.replace(' ', 'T'));
-        const distance = Math.floor((date - open) / (1000 * 60 * 60 * 24));
+        const distance = Math.floor((today - open) / (1000 * 60 * 60 * 24));
 
+        const todayYear = today.getFullYear();
+        const todayMonth = today.getMonth() + 1;
+        const todayDay = today.getDate();
+        const openYear = open.getFullYear();
+        const openMonth = open.getMonth() + 1;
+        const openDay = open.getDate();
+
+        let year = todayYear - openYear;
+        let month = todayMonth - openMonth;
+        let day = todayDay - openDay;
+
+        if(year < 0){
+          year = Math.abs(year);
+        }else if(year == 0){
+          year = 0;
+        }else{
+          year = year;
+        }
+
+        if(month < 0){
+          month = Math.abs(month);
+        }else if(month == 0){
+          month = 0;
+        }else{
+          month = month;
+        }
+
+        if(day < 0){
+          day = Math.abs(day);
+        }else if(day == 0){
+          day = 0;
+        }else{
+          day = day;
+        }
+        
         if(distance == 0){
           return 'D-Day!!!';
         }else{
-          return distance >= 0 ? `D+${distance}` : `D${distance}`;
+          return distance > 0
+            ? `D+${distance}, ${year}년 ${month}월 ${day}일 지났습니다`
+            : `D${distance}, ${year}년 ${month}월 ${day}일 남았습니다`;
         }
       },
       addEvents: function() {
