@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+  <style>
+    button{cursor:pointer}
+    .wrap_container{width:1000px;margin:0 auto}
+    .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events{height:2em}
+    .fc-daygrid-day{position:relative}
+    
+    .fc-daygrid-day .btn_add{position:absolute;top:5px;left:5px}
+    .item_schecule{overflow:hidden;padding:2px 50px 2px 0;text-overflow:ellipsis;white-space:nowrap}
+    
+    .dimmed{display:none;position:fixed;top:0;left:0;z-index:998;width:100%;height:100%;background:rgba(0,0,0,0.7)}
+    .wrap_layer{display:none;position:fixed;top:50%;left:50%;z-index:999;transform:translate(-50%, -50%);width:300px;padding:20px;background:#fff}
+    .wrap_layer .layer_content{position:relative}
+    .wrap_layer h3{margin:0}
+    .wrap_layer .txt_day{color:#244463}
+    .wrap_layer .tf_comm{width:100%;height:50px;margin:10px 0;padding:10px;resize:none;box-sizing:border-box}
+    .wrap_layer .btn_add{display:block;width:100%}
+    .wrap_layer .btn_close{position:absolute;top:10px;right:10px}
+    .fixed{overflow:hidden}
+    .fixed .dimmed{display:block}
+    .fixed .wrap_layer{display:block}
+  </style>
+</head>
+<body>
+  <div class="wrap_container">
+    <div id="calendar"></div>
+  </div>
+  <div class="dimmed"></div>
+  <div class="wrap_layer">
+    <div class="layer_content">
+      <h3><span class="txt_day"></span>일정 입력</h3>
+      <textarea class="tf_comm" placeholder="일정을 입력해주세요"></textarea>
+      <div class="box_button">
+        <button type="button" class="btn_add">추가</button>
+      </div>
+    </div>
+    <button type="button" class="btn_close">닫기</button>
+  </div>
+  
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let btnAddListenerFlag = false;
+      let calendarEl = document.getElementById('calendar');
+      let calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        // dateClick: function(info){ // 캘린더가 클릭될 때마다 실행됨
+        //   alert(info.dateStr);
+        // },
+        // events: events,  // 이벤트 데이터 
+        datesSet: function(){ // 캘린더가 렌더링될 때마다 실행됨
+          addCustomButtons();
+        }
+      });
+      calendar.render();
+
+      // 버튼 생성
+      function createElements(config){
+        const element = document.createElement(config.tag);
+        element.classList.add(config.className);
+        if(config.textCont){
+          element.textContent = config.textCont;
+        }
+        if(config.attr){
+          for(let key in config.attr){
+            element.setAttribute(key, config.attr[key]);
+          }
+        }
+        return element;
+      }
+
+      function addCustomButtons(){
+        // 모든 날짜 셀을 가져옴
+        document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
+          const date = cell.getAttribute('data-date');
+          const btnAdd = createElements({'tag': 'button', 'className': 'btn_add', 'textCont': '등록', 'attr': {'type': 'button'}});
+          
+          if(!cell.querySelector('.btn_add')){
+            cell.addEventListener('mouseenter', function(){
+              cell.appendChild(btnAdd);
+            });
+            cell.addEventListener('mouseleave', function(){
+              cell.removeChild(btnAdd);
+            });
+          }
+
+          btnAdd.addEventListener('click', function(){
+            const body = document.querySelector('body');
+            body.classList.add('fixed');
+            addSchedule(date);
+          });
+        });
+      }
+
+      // 일정 추가
+      function addSchedule(date){
+        const txtDay = document.querySelector('.txt_day');
+        txtDay.textContent = date;
+
+        const btnAdd = document.querySelector('.box_button .btn_add');
+        const tfComm = document.querySelector('.tf_comm');
+        
+        // btnAdd에 이벤트 리스너가 이미 있는지 확인
+        if(!btnAdd.hasAttribute('data-listener-added')){
+          btnAdd.addEventListener('click', function(){
+            if(isEmpty(tfComm)){
+              const body = document.querySelector('body');
+              body.classList.remove('fixed');
+              updateUI(txtDay.textContent, tfComm.value);
+              tfComm.value = '';
+            }
+          });
+          btnAdd.setAttribute('data-listener-added', 'true'); // 리스너가 추가되었음을 표시
+        }
+
+        const btnClose = document.querySelector('.btn_close');
+        btnClose.addEventListener('click', function(){
+          const body = document.querySelector('body');
+          body.classList.remove('fixed');
+          tfComm.value = '';
+        });
+      }
+
+      // 빈값 체크
+      function isEmpty(element) {
+        if(!element.value.trim()){
+          alert('값이 비어있습니다');
+          element.focus();
+          return false;
+        }else{
+          return true;
+        }
+      }
+
+      // UI 업데이트
+      function updateUI(date, value){
+        const currentDate = date;
+        
+        // 모든 날짜 셀을 가져옴
+        document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
+          const cellDate = cell.getAttribute('data-date');
+          if(currentDate == cellDate){
+            const itemSchedule = createElements({'tag': 'div', 'className': 'item_schecule', 'textCont': `${value}`});
+            cell.querySelector('.fc-daygrid-day-events').appendChild(itemSchedule);
+          }
+        });
+      }
+
+    });
+  </script>
+</body>
+</html>
