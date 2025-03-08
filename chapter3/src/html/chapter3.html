@@ -8,17 +8,21 @@
   <style>
     button{cursor:pointer}
     .wrap_container{width:1000px;margin:0 auto}
-    .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events{height:2em}
-    .fc-daygrid-day{position:relative}
     
+    .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events{height:2em}
+    
+    .fc-daygrid-day{position:relative}
     .fc-daygrid-day .btn_add{position:absolute;top:5px;left:5px}
-    .item_schecule{overflow:hidden;padding:2px 50px 2px 0;text-overflow:ellipsis;white-space:nowrap}
+    .fc-daygrid-day .item_schedule{overflow:hidden;margin:2px;padding:2px;border-radius:2px;text-overflow:ellipsis;white-space:nowrap;background-color:#ffe4e1}
+    .fc-daygrid-day .num_schedule{margin:2px;padding:2px}
+
+    .date_calendar{font-weight:bold}
     
     .dimmed{display:none;position:fixed;top:0;left:0;z-index:998;width:100%;height:100%;background:rgba(0,0,0,0.7)}
     .wrap_layer{display:none;position:fixed;top:50%;left:50%;z-index:999;transform:translate(-50%, -50%);width:300px;padding:20px;background:#fff}
     .wrap_layer .layer_content{position:relative}
     .wrap_layer h3{margin:0}
-    .wrap_layer .txt_day{color:#244463}
+    .wrap_layer .txt_day{color:#2c3e50}
     .wrap_layer .tf_comm{width:100%;height:50px;margin:10px 0;padding:10px;resize:none;box-sizing:border-box}
     .wrap_layer .btn_add{display:block;width:100%}
     .wrap_layer .btn_close{position:absolute;top:10px;right:10px}
@@ -30,6 +34,7 @@
 <body>
   <div class="wrap_container">
     <div id="calendar"></div>
+    <div class="list_calendar"></div>
   </div>
   <div class="dimmed"></div>
   <div class="wrap_layer">
@@ -43,16 +48,13 @@
     <button type="button" class="btn_close">닫기</button>
   </div>
   
-
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      let btnAddListenerFlag = false;
+      let scheduleData = {};
+
       let calendarEl = document.getElementById('calendar');
       let calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        // dateClick: function(info){ // 캘린더가 클릭될 때마다 실행됨
-        //   alert(info.dateStr);
-        // },
         // events: events,  // 이벤트 데이터 
         datesSet: function(){ // 캘린더가 렌더링될 때마다 실행됨
           addCustomButtons();
@@ -105,14 +107,14 @@
 
         const btnAdd = document.querySelector('.box_button .btn_add');
         const tfComm = document.querySelector('.tf_comm');
-        
+
         // btnAdd에 이벤트 리스너가 이미 있는지 확인
         if(!btnAdd.hasAttribute('data-listener-added')){
           btnAdd.addEventListener('click', function(){
             if(isEmpty(tfComm)){
               const body = document.querySelector('body');
               body.classList.remove('fixed');
-              updateUI(txtDay.textContent, tfComm.value);
+              updateCalendarUI(txtDay.textContent, tfComm.value);
               tfComm.value = '';
             }
           });
@@ -138,17 +140,57 @@
         }
       }
 
-      // UI 업데이트
-      function updateUI(date, value){
-        const currentDate = date;
+      // 캘린더 UI 업데이트
+      function updateCalendarUI(date, value){
+        if(!scheduleData[date]){
+          scheduleData[date] = [];
+        }
+
+        const newScheduleData = {
+          id: scheduleData[date].length + 1,
+          cont: value
+        };
+        scheduleData[date].push(newScheduleData);
         
         // 모든 날짜 셀을 가져옴
         document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
           const cellDate = cell.getAttribute('data-date');
-          if(currentDate == cellDate){
-            const itemSchedule = createElements({'tag': 'div', 'className': 'item_schecule', 'textCont': `${value}`});
-            cell.querySelector('.fc-daygrid-day-events').appendChild(itemSchedule);
+
+          if(date == cellDate){
+            const containerSchedule = cell.querySelector('.fc-daygrid-day-events');
+            containerSchedule.innerHTML = '';
+            
+            if(scheduleData[date]){
+              scheduleData[date].slice(0,2).forEach(scheduleData => {
+                const itemSchedule = createElements({'tag': 'div', 'className': 'item_schedule', 'textCont': scheduleData.cont});
+                containerSchedule.appendChild(itemSchedule);
+              });
+              if(scheduleData[date].length > 2){
+                let numSchedule = createElements({'tag': 'div', 'className': 'num_schedule', 'textCont': `그 외 +${scheduleData[date].length - 2}개...`});
+                containerSchedule.appendChild(numSchedule);
+              }
+            }
           }
+        });
+        updateScheduleUI();
+      }
+
+      // 일정 UI 업데이트
+      function updateScheduleUI(){
+        const listCalendar = document.querySelector('.list_calendar');
+        listCalendar.innerHTML = '';
+
+        Object.entries(scheduleData).forEach(([date, schedules]) => {
+          const dateContainer = createElements({'tag': 'div', 'className': 'date_calendar', 'textCont': date});
+          const contCalendar = createElements({'tag': 'div', 'className': 'cont_calendar'});
+          
+          schedules.forEach(schedule => {
+            const itemSchedule = createElements({'tag': 'div', 'className': 'item_schedule', 'textCont': schedule.cont});
+            contCalendar.appendChild(itemSchedule);
+          });
+
+          listCalendar.appendChild(dateContainer);
+          listCalendar.appendChild(contCalendar);
         });
       }
 
