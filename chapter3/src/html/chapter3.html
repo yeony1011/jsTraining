@@ -57,7 +57,7 @@
         initialView: 'dayGridMonth',
         // events: events,  // 이벤트 데이터 
         datesSet: function(){ // 캘린더가 렌더링될 때마다 실행됨
-          addCustomButtons();
+          init();
         }
       });
       calendar.render();
@@ -77,26 +77,29 @@
         return element;
       }
 
-      function addCustomButtons(){
+      function addCustomButtons(textCont){
         // 모든 날짜 셀을 가져옴
         document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
           const date = cell.getAttribute('data-date');
-          const btnAdd = createElements({'tag': 'button', 'className': 'btn_add', 'textCont': '등록', 'attr': {'type': 'button'}});
           
           if(!cell.querySelector('.btn_add')){
+            const btnAdd = createElements({'tag': 'button', 'className': 'btn_add', 'textCont': textCont, 'attr': {'type': 'button'}});
+
+            btnAdd.addEventListener('click', function(){
+              const body = document.querySelector('body');
+              body.classList.add('fixed');
+              addSchedule(date);
+            });
+
             cell.addEventListener('mouseenter', function(){
               cell.appendChild(btnAdd);
             });
             cell.addEventListener('mouseleave', function(){
-              cell.removeChild(btnAdd);
+              if(btnAdd.parentNode == cell){
+                cell.removeChild(btnAdd);
+              }
             });
           }
-
-          btnAdd.addEventListener('click', function(){
-            const body = document.querySelector('body');
-            body.classList.add('fixed');
-            addSchedule(date);
-          });
         });
       }
 
@@ -128,6 +131,57 @@
           tfComm.value = '';
         });
       }
+
+      // 일정 편집
+      function updateSchedule(date){
+        document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
+          const cellDate = cell.getAttribute('data-date');
+          
+          if(date == cellDate){
+            
+            const itemSchedules = cell.querySelectorAll('.item_schedule');
+            const btnEdit = createElements({'tag': 'button', 'className': 'btn_edit', 'textCont': '수정', 'attr': {'type': 'button'}});
+            itemSchedules.forEach((itemSchedule, index) => {
+              itemSchedule.addEventListener('mouseenter', function(){
+                itemSchedule.appendChild(btnEdit);
+              });
+              itemSchedule.addEventListener('mouseleave', function(){
+                if(btnEdit.parentNode == itemSchedule){
+                  itemSchedule.removeChild(btnEdit);
+                }
+              });
+            });
+            
+            btnEdit.addEventListener('click', function(){
+              const body = document.querySelector('body');
+              body.classList.add('fixed');
+
+              const tfComm = document.querySelector('.tf_comm');
+              tfComm.value = this.parentNode.textContent.slice(0, -2);
+              tfComm.focus();
+            });
+
+            
+            // btnAdd.addEventListener('click', function(){
+            //   const btnAdd = document.querySelector('.btn_add');
+
+            //   if(isEmpty(tfComm)){
+            //     updateCalendarUI(date, this.parentNode.textContent.slice(0, -2));
+                
+            //   }
+            // });
+            
+            // const btnClose = document.querySelector('.btn_close');
+            // btnClose.addEventListener('click', function(){
+            //   const body = document.querySelector('body');
+            //   body.classList.remove('fixed');
+            //   tfComm.value = '';
+            // });
+
+          }
+        });
+      }
+
 
       // 빈값 체크
       function isEmpty(element) {
@@ -173,6 +227,7 @@
           }
         });
         updateScheduleUI();
+        updateSchedule(date);
       }
 
       // 일정 UI 업데이트
@@ -192,6 +247,10 @@
           listCalendar.appendChild(dateContainer);
           listCalendar.appendChild(contCalendar);
         });
+      }
+
+      function init(){
+        addCustomButtons('등록');
       }
 
     });
