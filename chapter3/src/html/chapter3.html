@@ -56,7 +56,7 @@
       let calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         // events: events,  // 이벤트 데이터 
-        datesSet: function(){ // 캘린더가 렌더링될 때마다 실행됨
+        datesSet: function(){ // 캘린더가 렌더링 후 실행됨
           init();
         }
       });
@@ -89,6 +89,7 @@
               const body = document.querySelector('body');
               body.classList.add('fixed');
               addSchedule(date);
+              document.querySelector('.box_button .btn_add').removeAttribute('data-listener-added');
             });
 
             cell.addEventListener('mouseenter', function(){
@@ -120,8 +121,8 @@
               updateCalendarUI(txtDay.textContent, tfComm.value);
               tfComm.value = '';
             }
+            btnAdd.setAttribute('data-listener-added', 'true'); // 리스너가 추가되었음을 표시
           });
-          btnAdd.setAttribute('data-listener-added', 'true'); // 리스너가 추가되었음을 표시
         }
 
         const btnClose = document.querySelector('.btn_close');
@@ -150,34 +151,18 @@
                   itemSchedule.removeChild(btnEdit);
                 }
               });
+              btnEdit.addEventListener('click', function(){
+                if(itemSchedule == this.parentNode){
+                  const tfComm = document.querySelector('.tf_comm');
+                  const body = document.querySelector('body');
+                  
+                  body.classList.add('fixed');
+                  tfComm.value = this.parentNode.textContent.slice(0, -2);
+                  document.querySelector('.box_button .btn_add').removeAttribute('data-listener-added');
+                  tfComm.focus();
+                }
+              });
             });
-            
-            btnEdit.addEventListener('click', function(){
-              const body = document.querySelector('body');
-              body.classList.add('fixed');
-
-              const tfComm = document.querySelector('.tf_comm');
-              tfComm.value = this.parentNode.textContent.slice(0, -2);
-              tfComm.focus();
-            });
-
-            
-            // btnAdd.addEventListener('click', function(){
-            //   const btnAdd = document.querySelector('.btn_add');
-
-            //   if(isEmpty(tfComm)){
-            //     updateCalendarUI(date, this.parentNode.textContent.slice(0, -2));
-                
-            //   }
-            // });
-            
-            // const btnClose = document.querySelector('.btn_close');
-            // btnClose.addEventListener('click', function(){
-            //   const body = document.querySelector('body');
-            //   body.classList.remove('fixed');
-            //   tfComm.value = '';
-            // });
-
           }
         });
       }
