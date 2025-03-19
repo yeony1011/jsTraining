@@ -1,41 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
   <style>
-    button{cursor:pointer}
-    .wrap_container{width:1000px;margin:0 auto}
-    
-    .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events{height:2em}
-    
-    .fc-daygrid-day{position:relative}
-    .fc-daygrid-day .btn_add{position:absolute;top:5px;left:5px}
-    .fc-daygrid-day .item_schedule{position:relative;overflow:hidden;margin:2px;padding:2px 40px 2px 2px;border-radius:2px;text-overflow:ellipsis;white-space:nowrap;background-color:#ffe4e1}
-    .fc-daygrid-day .btn_edit{position:absolute;top:50%;right:0;transform:translateY(-50%)}
-    .fc-daygrid-day .num_schedule{margin:2px;padding:2px}
+    button {
+      cursor: pointer
+    }
 
-    .date_calendar{font-weight:bold}
-    
-    .dimmed{display:none;position:fixed;top:0;left:0;z-index:998;width:100%;height:100%;background:rgba(0,0,0,0.7)}
-    .wrap_layer{display:none;position:fixed;top:50%;left:50%;z-index:999;transform:translate(-50%, -50%);width:300px;padding:20px;background:#fff}
-    .wrap_layer .layer_content{position:relative}
-    .wrap_layer h3{margin:0}
-    .wrap_layer .txt_day{color:#2c3e50}
-    .wrap_layer .tf_comm{width:100%;height:50px;margin:10px 0;padding:10px;resize:none;box-sizing:border-box}
-    .wrap_layer .btn_add{display:block;width:100%}
-    .wrap_layer .btn_close{position:absolute;top:10px;right:10px}
-    .fixed{overflow:hidden}
-    .fixed .dimmed{display:block}
-    .fixed .wrap_layer{display:block}
+    .wrap_container {
+      display: flex;
+    }
+
+    .fc.fc-media-screen {
+      flex: 1;
+    }
+
+    .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+      height: 2em
+    }
+
+    .fc-daygrid-day {
+      position: relative
+    }
+
+    .fc-daygrid-day .btn_add {
+      position: absolute;
+      top: 5px;
+      left: 5px
+    }
+
+    .fc-daygrid-day .item_schedule {
+      position: relative;
+      overflow: hidden;
+      margin: 1px;
+      padding: 1px 65px 1px 1px;
+      border-radius: 3px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      background-color: #ffe4e1
+    }
+
+    .fc-daygrid-day .btn_edit {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%)
+    }
+
+    .fc-daygrid-day .btn_del {
+      position: absolute;
+      top: 50%;
+      right: 40px;
+      transform: translateY(-50%)
+    }
+
+    .fc-daygrid-day .num_schedule {
+      margin: 2px;
+      padding: 2px
+    }
+
+    .date_calendar {
+      font-weight: bold
+    }
+
+    .dimmed {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 998;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7)
+    }
+
+    .wrap_layer {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 999;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      padding: 20px;
+      background: #fff
+    }
+
+    .wrap_layer .layer_content {
+      position: relative
+    }
+
+    .wrap_layer h3 {
+      margin: 0
+    }
+
+    .wrap_layer .txt_day {
+      color: #2c3e50
+    }
+
+    .wrap_layer .tf_comm {
+      width: 100%;
+      height: 50px;
+      margin: 10px 0;
+      padding: 10px;
+      resize: none;
+      box-sizing: border-box
+    }
+
+    .wrap_layer .btn_add {
+      display: block;
+      width: 100%
+    }
+
+    .wrap_layer .btn_close {
+      position: absolute;
+      top: 10px;
+      right: 10px
+    }
+
+    .fixed {
+      overflow: hidden
+    }
+
+    .fixed .dimmed {
+      display: block
+    }
+
+    .fixed .wrap_layer {
+      display: block
+    }
+
+    .list_calendar {
+      width: 150px;
+      margin-left: auto;
+      padding: 10px;
+      word-wrap: break-word;
+      box-sizing: border-box;
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap_container">
     <div id="calendar"></div>
-    <div class="list_calendar"></div>
+    <div class="list_calendar">
+      <strong>일정 목록</strong>
+    </div>
   </div>
   <div class="dimmed"></div>
   <div class="wrap_layer">
@@ -48,58 +162,74 @@
     </div>
     <button type="button" class="btn_close">닫기</button>
   </div>
-  
+
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      let scheduleData = {};
+    document.addEventListener('DOMContentLoaded', function () {
+      let scheduleData = JSON.parse(localStorage.getItem('scheduleData')) || {}; // 데이터가 없으면 빈 객체로 초기화
       let editFlag = false;
       let editDate = '';
+
+      let url = new URLSearchParams(window.location.search);
+      let year = url.get('year') || new Date().getFullYear();
+      let month = url.get('month') || (new Date().getMonth() + 1);
 
       let calendarEl = document.getElementById('calendar');
       let calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        // events: events,  // 이벤트 데이터 
-        datesSet: function(){ // 캘린더가 렌더링 후 실행됨
+        initialDate: `${year}-${month.toString().padStart(2, '0')}`, // 초기 날짜 설정
+
+        datesSet: function (info) { // 캘린더가 렌더링 후 실행됨
+          let newYear = info.view.currentStart.getFullYear(); // 현재 캘린더의 연도
+          let newMonth = info.view.currentStart.getMonth() + 1; // 현재 캘린더의 달
+
+          if (year != newYear || month != newMonth) {
+            year = newYear;
+            month = newMonth;
+            isChangeURL(year, month);
+          }
           init();
         }
       });
       calendar.render();
 
       // 버튼 생성
-      function createElements(config){
+      function createElements(config) {
         const element = document.createElement(config.tag);
         element.classList.add(config.className);
-        if(config.textCont){
+        if (config.textCont) {
           element.textContent = config.textCont;
         }
-        if(config.attr){
-          for(let key in config.attr){
+        if (config.attr) {
+          for (let key in config.attr) {
             element.setAttribute(key, config.attr[key]);
           }
         }
         return element;
       }
 
-      function addCustomButtons(textCont){
+      function createButton(className, textCont) {
+        return createElements({ 'tag': 'button', 'className': className, 'textCont': textCont, 'attr': { 'type': 'button' } });
+      }
+
+      function addCustomButtons() {
         // 모든 날짜 셀을 가져옴
         document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
           const date = cell.getAttribute('data-date');
-          
-          if(!cell.querySelector('.btn_add')){
-            const btnAdd = createElements({'tag': 'button', 'className': 'btn_add', 'textCont': textCont, 'attr': {'type': 'button'}});
 
-            btnAdd.addEventListener('click', function(){
-              const body = document.querySelector('body');
-              body.classList.add('fixed');
+          if (!cell.querySelector('.btn_add')) {
+            const btnAdd = createButton('btn_add', '등록');
+
+            btnAdd.onclick = function () {
+              document.body.classList.add('fixed');
               addSchedule(date);
               document.querySelector('.box_button .btn_add').removeAttribute('data-listener-added');
-            });
+            }
 
-            cell.addEventListener('mouseenter', function(){
+            cell.addEventListener('mouseenter', function () {
               cell.appendChild(btnAdd);
             });
-            cell.addEventListener('mouseleave', function(){
-              if(btnAdd.parentNode == cell){
+            cell.addEventListener('mouseleave', function () {
+              if (btnAdd.parentNode == cell) {
                 cell.removeChild(btnAdd);
               }
             });
@@ -108,64 +238,63 @@
       }
 
       // 일정 추가
-      function addSchedule(date){
+      function addSchedule(date) {
         const txtDay = document.querySelector('.txt_day');
         txtDay.textContent = date;
-        console.log("✅ 일정추가",date);
-        
+        console.log("✅ 일정추가", date);
 
         const btnAdd = document.querySelector('.box_button .btn_add');
         const tfComm = document.querySelector('.tf_comm');
 
         // btnAdd에 이벤트 리스너가 이미 있는지 확인
-        if(!btnAdd.hasAttribute('data-listener-added')){
-          btnAdd.addEventListener('click', function(){
-            if(isEmpty(tfComm) && !editFlag){
-              const body = document.querySelector('body');
-              body.classList.remove('fixed');
+        if (!btnAdd.hasAttribute('data-listener-added')) {
+          btnAdd.onclick = function () {
+            if (isEmpty(tfComm) && !editFlag) {
+              document.body.classList.remove('fixed');
               updateCalendarUI(txtDay.textContent, tfComm.value, editFlag);
               tfComm.value = '';
             }
             btnAdd.setAttribute('data-listener-added', 'true'); // 리스너가 추가되었음을 표시
-          });
+          }
         }
 
         const btnClose = document.querySelector('.btn_close');
-        btnClose.addEventListener('click', function(){
-          const body = document.querySelector('body');
-          body.classList.remove('fixed');
+        btnClose.addEventListener('click', function () {
+          document.body.classList.remove('fixed');
           tfComm.value = '';
         });
       }
 
       // 일정 편집
-      function updateSchedule(date){
+      function updateSchedule(date) {
         document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
           const cellDate = cell.getAttribute('data-date');
-          
-          if(date == cellDate){
-            
+
+          if (date == cellDate) {
+
             const itemSchedules = cell.querySelectorAll('.item_schedule');
-            const btnEdit = createElements({'tag': 'button', 'className': 'btn_edit', 'textCont': '수정', 'attr': {'type': 'button'}});
+            const btnEdit = createButton('btn_edit', '수정');
+            const btnDel = createButton('btn_del', '삭제');
             const btnAdd = document.querySelector('.box_button .btn_add');
             const tfComm = document.querySelector('.tf_comm');
 
             itemSchedules.forEach(itemSchedule => {
-              itemSchedule.addEventListener('mouseenter', function(){
+              itemSchedule.addEventListener('mouseenter', function () {
                 itemSchedule.appendChild(btnEdit);
+                itemSchedule.appendChild(btnDel);
               });
-              itemSchedule.addEventListener('mouseleave', function(){
-                if(btnEdit.parentNode == itemSchedule){
+              itemSchedule.addEventListener('mouseleave', function () {
+                if (btnEdit.parentNode == itemSchedule) {
                   itemSchedule.removeChild(btnEdit);
+                  itemSchedule.removeChild(btnDel);
                 }
               });
             });
 
-            btnEdit.addEventListener('click', function(){
+            btnEdit.addEventListener('click', function () {
               const scheduleId = this.parentNode.getAttribute('data-id');
-              const scheduleText = this.parentNode.textContent.slice(0, -2);
-              const body = document.querySelector('body');
-              body.classList.add('fixed');
+              const scheduleText = this.parentNode.textContent.slice(0, -4);
+              document.body.classList.add('fixed');
 
               tfComm.dataset.scheduleId = scheduleId;
               tfComm.value = scheduleText;
@@ -175,82 +304,105 @@
               console.log("✅ 수정 버튼 클릭됨 editFlag:", editFlag, date)
             });
 
-            btnAdd.addEventListener('click', function(){
-              if(editFlag && editDate){
-                
-                const scheduleId = tfComm.dataset.scheduleId;
-                const updatedText = tfComm.value;
-                
-                console.log("✅ 추가 버튼 클릭됨");  
-                console.log("editFlag:", editFlag, "date", editDate, "수정ID", scheduleId, "입력된 일정 내용(변경내용):", updatedText);
-                
-                // 일정 데이터 업데이트
-                scheduleData[editDate] = scheduleData[editDate].map(schedule => 
-                  schedule.id == scheduleId ? {...schedule, cont: updatedText} : schedule
-                );
+            btnDel.addEventListener('click', function () {
+              const scheduleId = this.parentNode.getAttribute('data-id');
+              const parentDate = this.parentNode.parentNode.parentNode.parentNode.getAttribute('data-date'); // 해당 일정의 날짜
+
+              if (scheduleData[parentDate]) {
+                // 해당 ID를 가진 일정 삭제
+                scheduleData[parentDate] = scheduleData[parentDate].filter(schedule => schedule.id != scheduleId);
+
+                // 일정이 더 이상 없으면 해당 날짜 삭제
+                if (scheduleData[parentDate].length === 0) {
+                  delete scheduleData[parentDate];
+                }
+
+                // 로컬스토리지 업데이트
+                localStorage.setItem('scheduleData', JSON.stringify(scheduleData));
 
                 // UI 업데이트
-                updateCalendarUI(editDate, updatedText, editFlag);
-
-                const body = document.querySelector('body');
-                body.classList.remove('fixed');
-
-                // 수정 상태 초기화
-                tfComm.dataset.scheduleId = '';
-                editDate = '';
-                editFlag = false;
-
-                console.log("✅ 추가버튼 끝에 초기화 editFlag:", editFlag);
+                updateCalendarUI(parentDate, '', true);
               }
+              console.log(`✅ 삭제 : ${parentDate}의 ID ${scheduleId}`);
             });
 
+            btnAdd.addEventListener('click', function () {
+              if (editFlag && editDate) {
+                const scheduleId = tfComm.dataset.scheduleId;
+                const updatedText = tfComm.value;
+
+                console.log("✅ 추가 버튼 클릭됨");
+                console.log("editFlag:", editFlag, "date", editDate, "수정ID", scheduleId, "입력된 일정 내용(변경내용):", updatedText);
+                if (isEmpty(tfComm)) {
+                  // 일정 데이터 업데이트
+                  scheduleData[editDate] = scheduleData[editDate].map(schedule =>
+                    schedule.id == scheduleId ? { ...schedule, cont: updatedText } : schedule
+                  );
+
+                  // UI 업데이트
+                  updateCalendarUI(editDate, updatedText, editFlag);
+
+                  document.body.classList.remove('fixed');
+
+                  // 수정 상태 초기화
+                  tfComm.dataset.scheduleId = '';
+                  tfComm.value = '';
+                  editDate = '';
+                  editFlag = false;
+
+                  console.log("✅ 추가버튼 끝에 초기화 editFlag:", editFlag);
+                }
+              }
+            });
           }
         });
       }
 
-
       // 빈값 체크
       function isEmpty(element) {
-        if(!element.value.trim()){
+        if (!element.value.trim()) {
           alert('값이 비어있습니다');
           element.focus();
           return false;
-        }else{
+        } else {
           return true;
         }
       }
 
       // 캘린더 UI 업데이트
-      function updateCalendarUI(date, value, editFlag){
-        if(!scheduleData[date]){
+      function updateCalendarUI(date, value, editFlag) {
+        if (!scheduleData[date]) {
           scheduleData[date] = [];
         }
-        
+
         console.log("✅ UI 업데이트:", editFlag);
 
-        if(!editFlag){
+        if (!editFlag) {
           const newScheduleData = {
             id: scheduleData[date].length + 1,
             cont: value
           };
           scheduleData[date].push(newScheduleData);
         }
-        
+
+        // 로컬스토리지에 일정 데이터를 저장
+        localStorage.setItem('scheduleData', JSON.stringify(scheduleData));
+
         // 모든 날짜 셀을 가져옴
         document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
           const cellDate = cell.getAttribute('data-date');
 
-          if(date == cellDate){
+          if (date == cellDate) {
             const containerSchedule = cell.querySelector('.fc-daygrid-day-events');
             containerSchedule.innerHTML = '';
-            
-            if(scheduleData[date]){
-              scheduleData[date].slice(0,2).forEach(schedule => {
-                const itemSchedule = createElements({'tag': 'div', 'className': 'item_schedule', 'textCont': schedule.cont, 'attr': {'data-id': schedule.id}});
+
+            if (scheduleData[date]) {
+              scheduleData[date].slice(0, 2).forEach(schedule => {
+                const itemSchedule = createElements({ 'tag': 'div', 'className': 'item_schedule', 'textCont': schedule.cont, 'attr': { 'data-id': schedule.id } });
                 containerSchedule.appendChild(itemSchedule);
               });
-              if(scheduleData[date].length > 2){
-                let numSchedule = createElements({'tag': 'div', 'className': 'num_schedule', 'textCont': `그 외 +${scheduleData[date].length - 2}개...`});
+              if (scheduleData[date].length > 2) {
+                let numSchedule = createElements({ 'tag': 'div', 'className': 'num_schedule', 'textCont': `그 외 +${scheduleData[date].length - 2}개...` });
                 containerSchedule.appendChild(numSchedule);
               }
             }
@@ -261,16 +413,16 @@
       }
 
       // 일정 UI 업데이트
-      function updateScheduleUI(){
+      function updateScheduleUI() {
         const listCalendar = document.querySelector('.list_calendar');
         listCalendar.innerHTML = '';
 
         Object.entries(scheduleData).forEach(([date, schedules]) => {
-          const dateContainer = createElements({'tag': 'div', 'className': 'date_calendar', 'textCont': date});
-          const contCalendar = createElements({'tag': 'div', 'className': 'cont_calendar'});
-          
+          const dateContainer = createElements({ 'tag': 'div', 'className': 'date_calendar', 'textCont': date });
+          const contCalendar = createElements({ 'tag': 'div', 'className': 'cont_calendar' });
+
           schedules.forEach(schedule => {
-            const itemSchedule = createElements({'tag': 'div', 'className': 'item_schedule', 'textCont': schedule.cont});
+            const itemSchedule = createElements({ 'tag': 'div', 'className': 'item_schedule', 'textCont': schedule.cont });
             contCalendar.appendChild(itemSchedule);
           });
 
@@ -279,11 +431,24 @@
         });
       }
 
-      function init(){
-        addCustomButtons('등록');
+      function init() {
+        // 로컬스토리지에서 일정 데이터를 불러오기
+        const savedData = localStorage.getItem('scheduleData');
+        if (savedData) {
+          scheduleData = JSON.parse(savedData);  // JSON을 객체로 파싱하여 scheduleData에 저장
+        }
+
+        addCustomButtons();
+        isChangeURL(year, month);
       }
 
+      function isChangeURL(year, month) {
+        url.set('year', year);
+        url.set('month', month);
+        window.history.replaceState({}, '', `?${url.toString()}`);
+      }
     });
   </script>
 </body>
+
 </html>
