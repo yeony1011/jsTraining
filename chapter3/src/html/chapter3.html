@@ -35,13 +35,17 @@
 
     .fc-daygrid-day .item_schedule {
       position: relative;
-      overflow: hidden;
       margin: 1px;
-      padding: 2px 65px 2px 1px;
+      padding: 2px;
       border-radius: 3px;
+      background-color: #ffe4e1
+    }
+
+    .fc-daygrid-day .item_schedule.on {
+      overflow: hidden;
+      padding-right: 80px;
       text-overflow: ellipsis;
       white-space: nowrap;
-      background-color: #ffe4e1
     }
 
     .fc-daygrid-day .btn_edit {
@@ -204,8 +208,8 @@
       // 데이터 저장
       function setLocalStorageData() {
         // localStorage.setItem('scheduleData', JSON.stringify(scheduleData));
-        const cleanedData = Object.fromEntries(
-          Object.entries(scheduleData).filter(([_, value]) => value.length > 0) // ✅ 빈 값 제거
+        const cleanedData = Object.fromEntries( // fromEntries() : 다시 배열을 객체로 변환
+          Object.entries(scheduleData).filter(([_, value]) => value.length > 0)
         );
 
         localStorage.setItem('scheduleData', JSON.stringify(cleanedData));
@@ -314,11 +318,13 @@
               itemSchedule.addEventListener('mouseenter', function () {
                 itemSchedule.appendChild(btnEdit);
                 itemSchedule.appendChild(btnDel);
+                itemSchedule.classList.add('on');
               });
               itemSchedule.addEventListener('mouseleave', function () {
                 if (btnEdit.parentNode == itemSchedule) {
                   itemSchedule.removeChild(btnEdit);
                   itemSchedule.removeChild(btnDel);
+                  itemSchedule.classList.remove('on');
                 }
               });
             });
