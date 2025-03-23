@@ -185,7 +185,7 @@
 
       let url = new URLSearchParams(window.location.search);
       let year = url.get('year') || new Date().getFullYear();
-      let month = url.get('month') || (new Date().getMonth() + 1);
+      let month = url.get('month') || new Date().getMonth() + 1;
 
       const calendarEl = document.getElementById('calendar');
       const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -207,7 +207,6 @@
 
       // 데이터 저장
       function setLocalStorageData() {
-        // localStorage.setItem('scheduleData', JSON.stringify(scheduleData));
         const cleanedData = Object.fromEntries( // fromEntries() : 다시 배열을 객체로 변환
           Object.entries(scheduleData).filter(([_, value]) => value.length > 0)
         );
@@ -462,6 +461,7 @@
         getLocalStorageData();
       }
 
+      // URL 변경
       function isChangeURL(year, month) {
         url.set('year', year);
         url.set('month', month);
