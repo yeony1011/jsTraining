@@ -203,7 +203,12 @@
 
       // 데이터 저장
       function setLocalStorageData() {
-        localStorage.setItem('scheduleData', JSON.stringify(scheduleData));
+        // localStorage.setItem('scheduleData', JSON.stringify(scheduleData));
+        const cleanedData = Object.fromEntries(
+          Object.entries(scheduleData).filter(([_, value]) => value.length > 0) // ✅ 빈 값 제거
+        );
+
+        localStorage.setItem('scheduleData', JSON.stringify(cleanedData));
       }
 
       // 데이터 불러오기
@@ -333,22 +338,10 @@
 
             btnDel.addEventListener('click', function () {
               const scheduleId = this.closest('.item_schedule').getAttribute('data-id');
-              const parentDate = this.closest('.fc-daygrid-day').getAttribute('data-date'); // 해당 일정의 날짜
 
-              if (scheduleData[parentDate]) {
-                // 해당 ID를 가진 일정 삭제
-                scheduleData[parentDate] = scheduleData[parentDate].filter(schedule => schedule.id != scheduleId);
-
-                // 일정이 더 이상 없으면 해당 날짜 삭제
-                if (scheduleData[parentDate].length === 0) {
-                  delete scheduleData[parentDate];
-                }
-
-                setLocalStorageData();
-                updateCalendarUI(parentDate, '', true);
-                updateScheduleUI();
-              }
-              // console.log(`✅ 삭제 : ${parentDate}의 ID ${scheduleId}`);
+              scheduleData[date] = scheduleData[date].filter(schedule => schedule.id != scheduleId);
+              setLocalStorageData();
+              updateCalendarUI(date, '', true);
             });
 
             btnAdd.addEventListener('click', function () {
@@ -442,16 +435,18 @@
         listCalendar.innerHTML = '';
 
         Object.entries(scheduleData).forEach(([date, schedules]) => {
-          const dateContainer = createElements({ 'tag': 'div', 'className': 'date_calendar', 'textCont': date });
-          const contCalendar = createElements({ 'tag': 'div', 'className': 'cont_calendar' });
+          if (schedules.length > 0) {
+            const dateContainer = createElements({ 'tag': 'div', 'className': 'date_calendar', 'textCont': date });
+            const contCalendar = createElements({ 'tag': 'div', 'className': 'cont_calendar' });
 
-          schedules.forEach(schedule => {
-            const itemSchedule = createElements({ 'tag': 'div', 'className': 'item_schedule', 'textCont': schedule.cont });
-            contCalendar.appendChild(itemSchedule);
-          });
+            schedules.forEach(schedule => {
+              const itemSchedule = createElements({ 'tag': 'div', 'className': 'item_schedule', 'textCont': schedule.cont });
+              contCalendar.appendChild(itemSchedule);
+            });
 
-          listCalendar.appendChild(dateContainer);
-          listCalendar.appendChild(contCalendar);
+            listCalendar.appendChild(dateContainer);
+            listCalendar.appendChild(contCalendar);
+          }
         });
       }
 
