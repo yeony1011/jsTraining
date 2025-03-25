@@ -272,26 +272,38 @@
         });
       }
 
+      // 딤드 닫기
+      function dimmedClose(){
+        const dimmed = document.querySelector('.dimmed');
+        const tfComm = document.querySelector('.tf_comm');
+        dimmed.addEventListener('click', function(){
+          document.body.classList.remove('fixed');
+          tfComm.value = '';
+        });
+      }
+
       // 일정 추가
       function addSchedule(date) {
         const txtDay = document.querySelector('.txt_day');
-        const btnAdd = document.querySelector('.box_button .btn_add');
+        const btnAppend = document.querySelector('.box_button .btn_add');
         const tfComm = document.querySelector('.tf_comm');
 
         txtDay.textContent = date;
+        tfComm.focus();
 
         // console.log("✅ 일정추가", date);
 
-        // btnAdd에 이벤트 리스너가 이미 있는지 확인
-        if (!btnAdd.hasAttribute('data-listener-added')) {
-          btnAdd.onclick = function () {
+        // btnAppend에 이벤트 리스너가 이미 있는지 확인
+        if (!btnAppend.hasAttribute('data-listener-added')) {
+          btnAppend.onclick = function () {
             if (isEmpty(tfComm) && !editFlag) {
-              document.body.classList.remove('fixed');
               updateCalendarUI(txtDay.textContent, tfComm.value, editFlag);
+              document.body.classList.remove('fixed');
               tfComm.value = '';
             }
-            btnAdd.setAttribute('data-listener-added', 'true'); // 리스너가 추가되었음을 표시
+            btnAppend.setAttribute('data-listener-added', 'true'); // 리스너가 추가되었음을 표시
           }
+          btnAppend.removeAttribute('data-listener-added');
         }
 
         const btnClose = document.querySelector('.btn_close');
@@ -309,7 +321,7 @@
           if (date == cellDate) {
             const itemSchedules = cell.querySelectorAll('.item_schedule');
             const tfComm = document.querySelector('.tf_comm');
-            const btnAdd = document.querySelector('.box_button .btn_add');
+            const btnEditAppend = document.querySelector('.box_button .btn_add');
             const btnEdit = createButton('btn_edit', '수정');
             const btnDel = createButton('btn_del', '삭제');
 
@@ -332,6 +344,8 @@
               const scheduleId = this.parentNode.getAttribute('data-id');
               const scheduleText = this.parentNode.textContent.slice(0, -4);
               document.body.classList.add('fixed');
+              document.querySelector('.wrap_layer').setAttribute('data-type', 'edit');
+              tfComm.focus();
 
               tfComm.dataset.scheduleId = scheduleId;
               tfComm.value = scheduleText;
@@ -349,7 +363,7 @@
               updateCalendarUI(date, '', true);
             });
 
-            btnAdd.addEventListener('click', function () {
+            btnEditAppend.addEventListener('click', function () {
               if (editFlag && editDate) {
                 const scheduleId = tfComm.dataset.scheduleId;
                 const updatedText = tfComm.value;
@@ -366,12 +380,14 @@
                   updateCalendarUI(editDate, updatedText, editFlag);
 
                   document.body.classList.remove('fixed');
+                  tfComm.value = '';
 
                   // 수정 상태 초기화
                   tfComm.dataset.scheduleId = '';
-                  tfComm.value = '';
+                  
                   editDate = '';
                   editFlag = false;
+                  document.querySelector('.wrap_layer').removeAttribute('data-type');
 
                   // console.log("✅ 추가버튼 끝에 초기화 editFlag:", editFlag);
                 }
@@ -383,6 +399,8 @@
 
       // 빈값 체크
       function isEmpty(element) {
+        console.log('몇?');
+        
         if (!element.value.trim()) {
           alert('값이 비어있습니다');
           element.focus();
@@ -401,8 +419,9 @@
         // console.log("✅ UI 업데이트:", editFlag);
 
         if (!editFlag) {
+          const lastSchedule = scheduleData[date].length > 0 ? scheduleData[date][scheduleData[date].length - 1] : null;
           const newScheduleData = {
-            id: scheduleData[date].length + 1,
+            id: lastSchedule ? lastSchedule.id + 1 : 1,
             cont: value
           };
           scheduleData[date].push(newScheduleData);
@@ -459,6 +478,7 @@
         addCustomButtons();
         isChangeURL(year, month);
         getLocalStorageData();
+        dimmedClose();
       }
 
       // URL 변경
