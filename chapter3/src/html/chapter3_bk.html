@@ -7,36 +7,153 @@
   <title>Document</title>
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
   <style>
-    button{cursor:pointer}
-    .wrap_container{display:flex;}
-    .fc.fc-media-screen{flex:1;}
-    .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events{height:2em}
-    .fc-daygrid-day{position:relative}
-    .fc-daygrid-day .btn_add{position:absolute;top:5px;left:5px}
-    .fc-daygrid-day .item_schedule{position:relative;margin:1px;padding:2px;border-radius:3px;background-color:#ffe4e1}
-    .fc-daygrid-day .item_schedule.on{overflow:hidden;padding-right:80px;text-overflow:ellipsis;white-space:nowrap;}
-    .fc-daygrid-day .btn_edit{position:absolute;top:50%;right:0;transform:translateY(-50%)}
-    .fc-daygrid-day .btn_del{position:absolute;top:50%;right:40px;transform:translateY(-50%)}
-    .fc-daygrid-day .num_schedule{margin:2px;padding:2px}
-    .date_calendar{font-weight:bold}
-    .dimmed{display:none;position:fixed;top:0;left:0;z-index:998;width:100%;height:100%;background:rgba(0, 0, 0, 0.7)}
-    .wrap_layer{display:none;position:fixed;top:50%;left:50%;z-index:999;transform:translate(-50%, -50%);width:300px;padding:20px;background:#fff}
-    .wrap_layer .layer_content{position:relative}
-    .wrap_layer h3{margin:0}
-    .wrap_layer .txt_day{color:#2c3e50}
-    .wrap_layer .tf_comm{width:100%;height:50px;margin:10px 0;padding:10px;resize:none;box-sizing:border-box}
-    .wrap_layer .btn_add,
-    .wrap_layer .btn_editAdd{display:block;width:100%}
-    .wrap_layer .box_button .btn_editAdd{display:none}
-    .wrap_layer .box_button.edit .btn_add{display:none}
-    .wrap_layer .box_button.edit .btn_editAdd{display:block}
-    .wrap_layer .btn_close{position:absolute;top:10px;right:10px}
-    .fixed{overflow:hidden}
-    .fixed .dimmed{display:block}
-    .fixed .wrap_layer{display:block}
-    .box_calendar{width:150px;margin-left:auto;padding:10px;word-wrap:break-word;box-sizing:border-box;}
-    .box_calendar h2{margin:0 0 10px;}
-    .date_calendar{margin-top:10px;background:#ffe4e1;}
+    button {
+      cursor: pointer
+    }
+
+    .wrap_container {
+      display: flex;
+    }
+
+    .fc.fc-media-screen {
+      flex: 1;
+    }
+
+    .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+      height: 2em
+    }
+
+    .fc-daygrid-day {
+      position: relative
+    }
+
+    .fc-daygrid-day .btn_add {
+      position: absolute;
+      top: 5px;
+      left: 5px
+    }
+
+    .fc-daygrid-day .item_schedule {
+      position: relative;
+      margin: 1px;
+      padding: 2px;
+      border-radius: 3px;
+      background-color: #ffe4e1
+    }
+
+    .fc-daygrid-day .item_schedule.on {
+      overflow: hidden;
+      padding-right: 80px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fc-daygrid-day .btn_edit {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%)
+    }
+
+    .fc-daygrid-day .btn_del {
+      position: absolute;
+      top: 50%;
+      right: 40px;
+      transform: translateY(-50%)
+    }
+
+    .fc-daygrid-day .num_schedule {
+      margin: 2px;
+      padding: 2px
+    }
+
+    .date_calendar {
+      font-weight: bold
+    }
+
+    .dimmed {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 998;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7)
+    }
+
+    .wrap_layer {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 999;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      padding: 20px;
+      background: #fff
+    }
+
+    .wrap_layer .layer_content {
+      position: relative
+    }
+
+    .wrap_layer h3 {
+      margin: 0
+    }
+
+    .wrap_layer .txt_day {
+      color: #2c3e50
+    }
+
+    .wrap_layer .tf_comm {
+      width: 100%;
+      height: 50px;
+      margin: 10px 0;
+      padding: 10px;
+      resize: none;
+      box-sizing: border-box
+    }
+
+    .wrap_layer .btn_add {
+      display: block;
+      width: 100%
+    }
+
+    .wrap_layer .btn_close {
+      position: absolute;
+      top: 10px;
+      right: 10px
+    }
+
+    .fixed {
+      overflow: hidden
+    }
+
+    .fixed .dimmed {
+      display: block
+    }
+
+    .fixed .wrap_layer {
+      display: block
+    }
+
+    .box_calendar {
+      width: 150px;
+      margin-left: auto;
+      padding: 10px;
+      word-wrap: break-word;
+      box-sizing: border-box;
+    }
+
+    .box_calendar h2 {
+      margin: 0 0 10px;
+    }
+
+    .date_calendar {
+      margin-top: 10px;
+      background: #ffe4e1;
+    }
   </style>
 </head>
 
@@ -55,7 +172,6 @@
       <textarea class="tf_comm" placeholder="일정을 입력해주세요"></textarea>
       <div class="box_button">
         <button type="button" class="btn_add">추가</button>
-        <button type="button" class="btn_editAdd">수정</button>
       </div>
     </div>
     <button type="button" class="btn_close">닫기</button>
@@ -191,10 +307,10 @@
         }
 
         const btnClose = document.querySelector('.btn_close');
-        btnClose.onclick = function () {
+        btnClose.addEventListener('click', function () {
           document.body.classList.remove('fixed');
           tfComm.value = '';
-        }
+        });
       }
 
       // 일정 편집
@@ -205,8 +321,7 @@
           if (date == cellDate) {
             const itemSchedules = cell.querySelectorAll('.item_schedule');
             const tfComm = document.querySelector('.tf_comm');
-            const boxButton = document.querySelector('.box_button');
-            const btnEditAppend = document.querySelector('.box_button .btn_editAdd');
+            const btnEditAppend = document.querySelector('.box_button .btn_add');
             const btnEdit = createButton('btn_edit', '수정');
             const btnDel = createButton('btn_del', '삭제');
 
@@ -225,10 +340,9 @@
               });
             });
 
-            btnEdit.onclick = function () {
+            btnEdit.addEventListener('click', function () {
               const scheduleId = this.parentNode.getAttribute('data-id');
               const scheduleText = this.parentNode.textContent.slice(0, -4);
-              boxButton.classList.add('edit');
               document.body.classList.add('fixed');
               document.querySelector('.wrap_layer').setAttribute('data-type', 'edit');
               tfComm.focus();
@@ -239,17 +353,17 @@
               editDate = date;
 
               // console.log("✅ 수정 버튼 클릭됨 editFlag:", editFlag, date);
-            }
+            });
 
-            btnDel.onclick = function () {
+            btnDel.addEventListener('click', function () {
               const scheduleId = this.closest('.item_schedule').getAttribute('data-id');
 
               scheduleData[date] = scheduleData[date].filter(schedule => schedule.id != scheduleId);
               setLocalStorageData();
               updateCalendarUI(date, '', true);
-            }
+            });
 
-            btnEditAppend.onclick = function () {
+            btnEditAppend.addEventListener('click', function () {
               if (editFlag && editDate) {
                 const scheduleId = tfComm.dataset.scheduleId;
                 const updatedText = tfComm.value;
@@ -274,12 +388,11 @@
                   editDate = '';
                   editFlag = false;
                   document.querySelector('.wrap_layer').removeAttribute('data-type');
-                  boxButton.classList.remove('edit');
 
                   // console.log("✅ 추가버튼 끝에 초기화 editFlag:", editFlag);
                 }
               }
-            }
+            });
           }
         });
       }
