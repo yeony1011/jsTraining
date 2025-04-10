@@ -74,28 +74,25 @@
     function appendVideo(){
       const tfComm = document.querySelector('.tf_comm');
 
-      if(isEmpty(tfComm)){
-        const vodId = tfComm.value;
-        tfComm.value = '';
+      if(!isEmpty(tfComm)) return;
 
-        if(playListArr.includes(vodId)){
-          alert('이미 추가한 영상입니다');
-          return;
-        }
+      const vodId = tfComm.value;
+      tfComm.value = '';
 
-        document.querySelectorAll('.box_button button').forEach((item) => {
-          item.disabled = false;
-          item.classList.remove('disabled');
-        });
-
-        playListArr.push(vodId);
-
-        const currentIndex = player.getPlaylistIndex();
-        player.loadPlaylist({
-          playlist: playListArr,
-          index: currentIndex
-        });
+      if(playListArr.includes(vodId)){
+        alert('이미 추가한 영상입니다');
+        return;
       }
+
+      allButtonsReset();
+
+      playListArr.push(vodId);
+
+      const currentIndex = player.getPlaylistIndex();
+      player.loadPlaylist({
+        playlist: playListArr,
+        index: currentIndex
+      });
     }
 
     // 버튼 활성/비활성화 공통 토글
@@ -107,6 +104,14 @@
         document.querySelector(`.${button}`).disabled = false;
         document.querySelector(`.${button}`).classList.remove('disabled');
       }
+    }
+
+    // 모든 버튼 초기화
+    function allButtonsReset(){
+      document.querySelectorAll('.box_button button').forEach((item) => {
+        item.disabled = false;
+        item.classList.remove('disabled');
+      });
     }
 
     // 이전 영상 재생
@@ -130,21 +135,36 @@
     }
 
     // 랜덤 영상 재생
-    function shuffleVideo(event){
+    function shuffleVideo(){
+      const shuffleListArr = shuffleArr(playListArr);
+      player.loadPlaylist(shuffleListArr);
+      
+      allButtonsReset();
+    }
 
+    // 랜덤 배열 생성
+    function shuffleArr(array){
+      const shuffled = [...array];
+      
+      for(let i = shuffled.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1)); // 0 ~ i 중 랜덤 숫자에 (i + 1) 곱하고 내림으로 정수로 만듬
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // 구조분해할당 두 값 자리 바꾸기
+      }
+      return shuffled;
     }
 
     // 이벤트 연결
     function bindEvents(){
-      const btnAppend = document.querySelector('.btn_append');
-      const btnPrev = document.querySelector('.btn_prev');
-      const btnNext = document.querySelector('.btn_next');
-      const btnShuffle = document.querySelector('.btn_shuffle');
-      
-      btnAppend.addEventListener('click', appendVideo);
-      btnPrev.addEventListener('click', prevVideo);
-      btnNext.addEventListener('click', nextVideo);
-      btnShuffle.addEventListener('click', shuffleVideo);
+      const eventMapping = {
+        'btn_append': appendVideo,
+        'btn_prev': prevVideo,
+        'btn_next': nextVideo,
+        'btn_shuffle': shuffleVideo
+      }
+      for(const [selector, handler] of Object.entries(eventMapping)){
+        const button = document.querySelector(`.${selector}`);
+        button.addEventListener('click', handler);
+      }
     }
 
     // 초기화
