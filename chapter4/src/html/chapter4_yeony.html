@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    button{width:100px;height:34px;border:1px solid #000;background-color:#000;color:#fff;cursor:pointer}
+    .wrap_video{width:640px;margin:0 auto}
+    .box_form,
+    .box_button{display:flex;flex-wrap:wrap}
+    .box_form .tf_comm{flex:1;height:30px;border:1px solid #000}
+    .box_button{margin-top:5px}
+    .box_button button{margin-right:5px}
+    .box_button button:disabled{opacity:0.2;cursor:not-allowed;}
+  </style>
+</head>
+<body>
+  <div class="wrap_video">
+    <div id="player" class="box_video"></div>
+    <div class="box_form">
+      <input type="text" class="tf_comm" placeholder="youtube id를 입력하세요">
+      <button type="button" class="btn_append">영상추가</button>
+    </div>
+    <div class="box_button">
+      <button type="button" class="btn_prev">이전영상</button>
+      <button type="button" class="btn_next">다음영상</button>
+      <button type="button" class="btn_shuffle">랜덤영상</button>
+    </div>
+  </div>
+  <script>
+    let player;
+    let playListArr = ['GmYsazN2FXA', 'CxcTQm9UYS4', 'jyUUHITab8w'];
+
+    // YouTube Iframe API를 비동기로 로드
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // YouTube Iframe API가 로드되면 onYouTubeIframeAPIReady 함수 호출
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '390',
+        width: '640',
+        videoId: '',
+        playerVars: {
+          'listType': 'playlist',
+          'list': playListArr.join(','), // 리스트로 변환해서 넣기
+        },
+        events: {
+          'onReady': onPlayerReady,
+        }
+      });
+    }
+
+    // 플레이어 준비 완료 시 호출되는 함수
+    function onPlayerReady(event) {
+      player.loadPlaylist(playListArr);
+    }
+    
+    // 빈값 체크
+    function isEmpty(element) {
+      if (!element.value.trim()) {
+        alert('값이 비어있습니다');
+        element.focus();
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+    // 영상 추가
+    function appendVideo(){
+      const tfComm = document.querySelector('.tf_comm');
+
+      if(isEmpty(tfComm)){
+        const vodId = tfComm.value;
+        tfComm.value = '';
+
+        if(playListArr.includes(vodId)){
+          alert('이미 추가한 영상입니다');
+          return;
+        }
+
+        document.querySelectorAll('.box_button button').forEach((item) => {
+          item.disabled = false;
+          item.classList.remove('disabled');
+        });
+
+        playListArr.push(vodId);
+
+        const currentIndex = player.getPlaylistIndex();
+        player.loadPlaylist({
+          playlist: playListArr,
+          index: currentIndex
+        });
+      }
+    }
+
+    // 버튼 활성/비활성화 공통 토글
+    function toggleButtons(button, disabled){
+      if(disabled){
+        button.disabled = true;
+        button.classList.add('disabled');
+      }else{
+        document.querySelector(`.${button}`).disabled = false;
+        document.querySelector(`.${button}`).classList.remove('disabled');
+      }
+    }
+
+    // 이전 영상 재생
+    function prevVideo(event){
+      if(player.getPlaylistIndex() === 0){
+        toggleButtons(event.target, true);
+      }else{
+        toggleButtons('btn_next', false);
+      }
+      player.previousVideo();
+    }
+
+    // 다음 영상 재생
+    function nextVideo(event){
+      if(player.getPlaylistIndex() === playListArr.length - 1){
+        toggleButtons(event.target, true);
+      }else{
+        toggleButtons('btn_prev', false);
+      }
+      player.nextVideo();
+    }
+
+    // 랜덤 영상 재생
+    function shuffleVideo(event){
+
+    }
+
+    // 이벤트 연결
+    function bindEvents(){
+      const btnAppend = document.querySelector('.btn_append');
+      const btnPrev = document.querySelector('.btn_prev');
+      const btnNext = document.querySelector('.btn_next');
+      const btnShuffle = document.querySelector('.btn_shuffle');
+      
+      btnAppend.addEventListener('click', appendVideo);
+      btnPrev.addEventListener('click', prevVideo);
+      btnNext.addEventListener('click', nextVideo);
+      btnShuffle.addEventListener('click', shuffleVideo);
+    }
+
+    // 초기화
+    function init(){
+      bindEvents();
+    }
+
+    init();
+  </script>
+</body>
+</html>
