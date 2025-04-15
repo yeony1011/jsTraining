@@ -10,9 +10,13 @@
     .box_form,
     .box_button{display:flex;flex-wrap:wrap}
     .box_form .tf_comm{flex:1;height:30px;border:1px solid #000}
+    .wrap_video strong{display:block;padding:20px 0}
     .box_button{margin-top:5px}
     .box_button button{margin-right:5px}
     .box_button button:disabled{opacity:0.2;cursor:not-allowed;}
+    .btn_playvideo{display:flex;align-items:center;width:100%;height:90px;margin-bottom:3px;padding:0;color:#000;background-color:transparent;cursor:pointer;}
+    .img_playvideo{width:160px;height:90px;background-position:0 0;background-repeat:no-repeat;background-size:cover;}
+    .txt_playvideo{flex:1;padding-left:10px;text-align:left}
   </style>
 </head>
 <body>
@@ -27,6 +31,8 @@
       <button type="button" class="btn_next">다음영상</button>
       <button type="button" class="btn_shuffle">랜덤영상</button>
     </div>
+    <strong>재생 목록</strong>
+    <div class="list_playvideo"></div>
   </div>
   <script>
     let player;
@@ -87,6 +93,7 @@
       allButtonsReset();
 
       playListArr.push(vodId);
+      listPlayVideo(playListArr);
 
       const currentIndex = player.getPlaylistIndex();
       player.loadPlaylist({
@@ -142,6 +149,18 @@
       allButtonsReset();
     }
 
+    // 선택한 영상 재생
+    function playSelectedVideo(event){
+      const clicked = event.target.closest('.btn_playvideo');
+      if (clicked) {
+        const playVideoId = clicked.dataset.id;
+        const index = playListArr.indexOf(playVideoId);
+        if (index > -1) {
+          player.playVideoAt(index);
+        }
+      }
+    }
+
     // 랜덤 배열 생성
     function shuffleArr(array){
       const shuffled = [...array];
@@ -153,13 +172,57 @@
       return shuffled;
     }
 
+    // 요소 생성
+    function createElements(config) {
+      const element = document.createElement(config.tag);
+      element.classList.add(config.className);
+      if (config.textCont) {
+        element.textContent = config.textCont;
+      }
+      if (config.attr) {
+        for (let key in config.attr) {
+          element.setAttribute(key, config.attr[key]);
+        }
+      }
+      return element;
+    }
+
+    // 재생목록 영상 리스트 생성
+    //// forEach는 기다리지 않고 모두 순회함 / await과 동작 가능한 for...of	사용
+    async function listPlayVideo(array){
+      const noEmbed = 'https://noembed.com/embed?url=';
+      const youtubeUrl = 'https://www.youtube.com/watch?v=';
+      const listPlayVideo = document.querySelector('.list_playvideo');
+
+      listPlayVideo.innerHTML = '';
+
+      for (const playVideoId of array) {
+        try{
+          const API_URL = noEmbed + youtubeUrl + playVideoId;
+          const response = await fetch(API_URL);
+          if(response){
+            let data = await response.json();
+            const btnPlayVideo = createElements({ 'tag': 'button', 'className': 'btn_playvideo', 'attr': {'type': 'button', 'data-id': playVideoId} });
+            const imgPlayVideo = createElements({ 'tag': 'span', 'className': 'img_playvideo', 'attr': {'style': `background-image:url(https://img.youtube.com/vi/${playVideoId}/mqdefault.jpg)`} });
+            const txtPlayVideo = createElements({ 'tag': 'span', 'className': 'txt_playvideo', textCont: data.title });
+            listPlayVideo.appendChild(btnPlayVideo);
+            btnPlayVideo.appendChild(imgPlayVideo);
+            btnPlayVideo.appendChild(txtPlayVideo);
+          }
+        }catch(err){
+          console.log(err);
+        }
+      }
+    }
+
     // 이벤트 연결
     function bindEvents(){
       const eventMapping = {
         'btn_append': appendVideo,
         'btn_prev': prevVideo,
         'btn_next': nextVideo,
-        'btn_shuffle': shuffleVideo
+        'btn_shuffle': shuffleVideo,
+        'list_playvideo': playSelectedVideo
       }
       for(const [selector, handler] of Object.entries(eventMapping)){
         const button = document.querySelector(`.${selector}`);
@@ -169,6 +232,7 @@
 
     // 초기화
     function init(){
+      listPlayVideo(playListArr);
       bindEvents();
     }
 
