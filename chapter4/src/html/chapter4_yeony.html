@@ -14,8 +14,9 @@
     .box_button{margin-top:5px}
     .box_button button{margin-right:5px}
     .box_button button:disabled{opacity:0.2;cursor:not-allowed;}
-    .btn_playvideo{display:flex;align-items:center;width:100%;height:90px;margin-bottom:3px;padding:0;color:#000;background-color:transparent;cursor:pointer;}
-    .img_playvideo{width:160px;height:90px;background-position:0 0;background-repeat:no-repeat;background-size:cover;}
+    .btn_playvideo{display:flex;align-items:center;width:100%;height:90px;margin-bottom:3px;padding:0;color:#000;background-color:transparent;cursor:pointer;transition:all .3s ease-in-out}
+    .btn_playvideo.on{border-color:yellowgreen;background-color:lightyellow}
+    .img_playvideo{width:160px;height:90px;background-position:50% 50%;background-repeat:no-repeat;background-size:cover;}
     .txt_playvideo{flex:1;padding-left:10px;text-align:left}
   </style>
 </head>
@@ -56,6 +57,7 @@
         },
         events: {
           'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
         }
       });
     }
@@ -63,6 +65,17 @@
     // 플레이어 준비 완료 시 호출되는 함수
     function onPlayerReady(event) {
       player.loadPlaylist(playListArr);
+    }
+
+    // 플레이어 상태 변경시
+    function onPlayerStateChange(event) {
+      if(event.data === YT.PlayerState.PLAYING){
+        const currentIndex = player.getPlaylistIndex();
+        
+        document.querySelectorAll('.btn_playvideo').forEach((btn, index) => {
+          btn.classList.toggle('on', index === currentIndex);
+        });
+      }
     }
     
     // 빈값 체크
@@ -144,21 +157,12 @@
     // 랜덤 영상 재생
     function shuffleVideo(){
       const shuffleListArr = shuffleArr(playListArr);
-      player.loadPlaylist(shuffleListArr);
+      
+      playListArr = [...shuffleListArr];
+      player.loadPlaylist(playListArr);
+      listPlayVideo(playListArr);
       
       allButtonsReset();
-    }
-
-    // 선택한 영상 재생
-    function playSelectedVideo(event){
-      const clicked = event.target.closest('.btn_playvideo');
-      if (clicked) {
-        const playVideoId = clicked.dataset.id;
-        const index = playListArr.indexOf(playVideoId);
-        if (index > -1) {
-          player.playVideoAt(index);
-        }
-      }
     }
 
     // 랜덤 배열 생성
@@ -170,6 +174,22 @@
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // 구조분해할당 두 값 자리 바꾸기
       }
       return shuffled;
+    }
+
+    // 선택한 영상 재생
+    function playSelectedVideo(event){
+      const clicked = event.target.closest('.btn_playvideo');
+      
+      document.querySelectorAll('.btn_playvideo').forEach(btn => btn.classList.remove('on'));
+
+      if(clicked){
+        const playVideoId = clicked.dataset.id;
+        const index = playListArr.indexOf(playVideoId);
+        if(index > -1){
+          clicked.classList.add('on');
+          player.playVideoAt(index);
+        }
+      }
     }
 
     // 요소 생성
@@ -196,18 +216,22 @@
 
       listPlayVideo.innerHTML = '';
 
-      for (const playVideoId of array) {
+      for (const [index, playVideoId] of array.entries()) {
         try{
           const API_URL = noEmbed + youtubeUrl + playVideoId;
           const response = await fetch(API_URL);
           if(response){
             let data = await response.json();
             const btnPlayVideo = createElements({ 'tag': 'button', 'className': 'btn_playvideo', 'attr': {'type': 'button', 'data-id': playVideoId} });
-            const imgPlayVideo = createElements({ 'tag': 'span', 'className': 'img_playvideo', 'attr': {'style': `background-image:url(https://img.youtube.com/vi/${playVideoId}/mqdefault.jpg)`} });
+            const imgPlayVideo = createElements({ 'tag': 'span', 'className': 'img_playvideo', 'attr': {'style': `background-image:url(${data.thumbnail_url})`} });
             const txtPlayVideo = createElements({ 'tag': 'span', 'className': 'txt_playvideo', textCont: data.title });
             listPlayVideo.appendChild(btnPlayVideo);
             btnPlayVideo.appendChild(imgPlayVideo);
             btnPlayVideo.appendChild(txtPlayVideo);
+            
+            if(index === 0){
+              btnPlayVideo.classList.add('on');
+            }
           }
         }catch(err){
           console.log(err);
