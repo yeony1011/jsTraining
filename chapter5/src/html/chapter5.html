@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="wrap_converter">
+    <h1>HTML 태그 변환기(Tag Converter)</h1>
+    <div class="tag_converter">aaaa</div>
+    <button type="button" class="btn_create">버튼생성</button>
+  </div>
+  <script>
+    // button create
+    function createButton(){
+      const tagArea = prompt('변경할 태그를 입력하세요.(예: div, section, button, ...)');
+      const elementList = [
+        'a',
+        'abbr',
+        'address',
+        'area',
+        'article',
+        'aside',
+        'audio',
+        'b',
+        'base',
+        'bdi',
+        'bdo',
+        'blockquote',
+        'body',
+        'br',
+        'button',
+        'canvas',
+        'caption',
+        'cite',
+        'code',
+        'col',
+        'colgroup',
+        'data',
+        'datalist',
+        'dd',
+        'del',
+        'details',
+        'dfn',
+        'dialog',
+        'div',
+        'dl',
+        'dt',
+        'em',
+        'embed',
+        'fieldset',
+        'figcaption',
+        'figure',
+        'footer',
+        'form',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'head',
+        'header',
+        'hgroup',
+        'hr',
+        'html',
+        'i',
+        'iframe',
+        'img',
+        'input',
+        'ins',
+        'kbd',
+        'label',
+        'legend',
+        'li',
+        'link',
+        'main',
+        'map',
+        'mark',
+        'menu',
+        'meta',
+        'meter',
+        'nav',
+        'noscript',
+        'object',
+        'ol',
+        'optgroup',
+        'option',
+        'output',
+        'p',
+        'param',
+        'picture',
+        'pre',
+        'progress',
+        'q',
+        'rp',
+        'rt',
+        'ruby',
+        's',
+        'samp',
+        'script',
+        'search',
+        'section',
+        'select',
+        'small',
+        'source',
+        'span',
+        'strong',
+        'style',
+        'sub',
+        'summary',
+        'sup',
+        'svg',
+        'table',
+        'tbody',
+        'td',
+        'template',
+        'textarea',
+        'tfoot',
+        'th',
+        'thead',
+        'time',
+        'title',
+        'tr',
+        'track',
+        'u',
+        'ul',
+        'var',
+        'video',
+        'wbr',
+      ];
+      const wrapConverter = document.querySelector('.wrap_converter');
+      const btnConverter = document.createElement('button');
+      
+      if(document.querySelector('.btn_converter') != null){
+        wrapConverter.removeChild(document.querySelector('.btn_converter'));
+      }
+
+      if(elementList.includes(tagArea)){
+        btnConverter.textContent = tagArea;
+        wrapConverter.appendChild(btnConverter).setAttribute('type', 'button');
+        btnConverter.setAttribute('class', 'btn_converter');
+        btnConverter.onclick = function(){
+          converter(tagArea);
+        };
+        
+        // 동적생성된 버튼에서는 이벤트 위임을 사용해야함, 아래와 같은 방식은 동적생성된 버튼에 적용되 않음
+        // converter(tagArea);
+      }else{
+        alert(`${tagArea} 태그는 존재하지 않습니다`);
+      }
+    }
+
+    // converter
+    function converter(tagArea){      
+      const currentTag = document.querySelector('.tag_converter');
+      const updatedTag = document.createElement(tagArea);
+      
+      switch(tagArea){
+        case 'a':
+          updatedTag.setAttribute('href', '#none');
+          break;
+        case 'button':
+          updatedTag.setAttribute('type', 'button');
+          break;
+        case 'input':
+          updatedTag.setAttribute('type', 'text');
+          updatedTag.setAttribute('value', currentTag.textContent);
+          break;
+        case 'img':
+          updatedTag.setAttribute('src', '');
+          updatedTag.setAttribute('alt', currentTag.textContent);
+          break;
+        case 'label':
+          updatedTag.setAttribute('for', '');
+          break;
+      }
+
+      updatedTag.classList.add('tag_converter');
+      if(tagArea !== 'img' || tagArea !== 'input'){
+        updatedTag.textContent = currentTag.textContent;
+      }
+      currentTag.replaceWith(updatedTag);
+    }
+
+    // 이벤트 연결
+    function bindEvents(){
+      const btnCreate = document.querySelector('.btn_create');
+      btnCreate.addEventListener('click', createButton);
+    }
+
+    // 초기화
+    function init(){
+      bindEvents();
+    }
+
+    init();
+  </script>
+</body>
+</html>
