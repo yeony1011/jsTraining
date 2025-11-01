@@ -15,7 +15,7 @@
     // button create
     function createButton(){
       const tagArea = prompt('변경할 태그를 입력하세요.(예: div, section, button, ...)');
-      const elementList = [
+      const elementList = new Set([
         'a',
         'abbr',
         'address',
@@ -129,7 +129,7 @@
         'var',
         'video',
         'wbr',
-      ];
+      ]);
       const wrapConverter = document.querySelector('.wrap_converter');
       const btnConverter = document.createElement('button');
       
@@ -137,7 +137,7 @@
         wrapConverter.removeChild(document.querySelector('.btn_converter'));
       }
 
-      if(elementList.includes(tagArea)){
+      if(elementList.has(tagArea)){
         btnConverter.textContent = tagArea;
         wrapConverter.appendChild(btnConverter).setAttribute('type', 'button');
         btnConverter.setAttribute('class', 'btn_converter');
@@ -178,7 +178,7 @@
       }
 
       updatedTag.classList.add('tag_converter');
-      if(tagArea !== 'img' || tagArea !== 'input'){
+      if(tagArea !== 'img' && tagArea !== 'input'){
         updatedTag.textContent = currentTag.textContent;
       }
       currentTag.replaceWith(updatedTag);

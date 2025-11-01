@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="wrap_converter">
+    <h1>텍스트 태그 생성기(Text Tag Creator)</h1>
+    <div class="tag_converter">aaaabbbbccccdddd</div>
+    <button type="reset" class="btn_reset">초기화</button>
+  </div>
+  <div class="wrap_button">
+    <ul class="list_button">
+      <li>
+        <button type="button" class="btn_wrap">div</button>
+      </li>
+      <li>
+        <button type="button" class="btn_wrap">span</button>
+      </li>
+      <li>
+        <button type="button" class="btn_wrap">strong</button>
+      </li>
+      <li>
+        <button type="button" class="btn_wrap">p</button>
+      </li>
+    </ul>
+  </div>
+  <script>
+    // 컨텐츠 초기화
+    function resetContent(){
+      const tagConverter = document.querySelector('.tag_converter');
+      tagConverter.innerText = tagConverter.textContent;
+    }
+
+    // 컨텐츠 변경
+    function updateContent(btnElement){
+      const tagConverter = document.querySelector('.tag_converter');
+      const selection = window.getSelection();
+
+      const element = btnElement.target.innerText;
+      const startIdx = selection.anchorOffset;
+      const endIdx = selection.focusOffset;
+      const currentTxt = tagConverter.textContent;
+
+      if(startIdx < endIdx){
+        tagConverter.innerHTML = `${currentTxt.slice(0, startIdx)}<${element}>${currentTxt.slice(startIdx, endIdx)}</${element}>${currentTxt.slice(endIdx)}`;
+      }else if(startIdx > endIdx){
+        tagConverter.innerHTML = `${currentTxt.slice(0, endIdx)}<${element}>${currentTxt.slice(endIdx, startIdx)}</${element}>${currentTxt.slice(startIdx)}`;
+      }else{
+        alert('선택되지 않았습니다');
+      }
+    }
+
+    // 이벤트 연결
+    function bindEvents(){
+      const btnWrap = document.querySelectorAll('.btn_wrap');
+      btnWrap.forEach((btn) => {
+        btn.addEventListener('click', updateContent);
+      });
+
+      const btnReset = document.querySelector('.btn_reset');
+      btnReset.addEventListener('click', resetContent);
+    }
+
+    // 초기화
+    function init(){
+      bindEvents();
+    }
+
+    init();
+  </script>
+</body>
+</html>
