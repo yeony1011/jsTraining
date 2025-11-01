@@ -17,18 +17,18 @@
 ㄴ replaceWith
 
 ## STUDY
-&& (AND)
+### && (AND)
 - true && true = true → 실행
 - false && true = false → 미실행
 - true && false = false → 미실행
 
-|| (OR)
+### || (OR)
 - true || true = true → 실행
 - false || true = true → 실행
 - true || false = true → 실행
 
-Set vs 배열 비교
-Set : 중복 없는 값 모음
+### Set vs 배열 비교
+#### Set : 중복 없는 값 모음
 ```
 const mySet = new Set(['사과', '바나나', '사과']);
 console.log(mySet); // Set(2) {'사과', '바나나'} ← 중복 제거!
@@ -39,7 +39,7 @@ mySet.add('오렌지');  // 요소 추가
 mySet.delete('사과'); // 요소 삭제
 ```
 
-배열
+#### 배열
 ```
 const myArray = ['사과', '바나나', '사과'];
 console.log(myArray); // ['사과', '바나나', '사과'] ← 중복 그대로
@@ -48,7 +48,7 @@ console.log(myArray); // ['사과', '바나나', '사과'] ← 중복 그대로
 myArray.includes('사과'); // true ← 느림 (배열 전체 탐색)
 ```
 
-[replaceWith()](https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith)
+### [replaceWith()](https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith)
 DOM 요소를 다른 요소나 텍스트로 교체할 때 사용하는 메서드
 ```
 oldElement.replaceWith(newElement);
@@ -56,11 +56,11 @@ oldElement.replaceWith(newElement);
 // newElement: 새로 대체할 요소(또는 텍스트)
 ```
 
-이벤트 위임
+### 이벤트 위임
 - 메모리 절약 : 많은 핸들러를 등록하는 대신 하나만 등록하여 메모리 사용량을 줄일 수 있다
 - 동적 요소 처리 : 나중에 동적으로 추가되는 하위 요소에 대해서도 별도의 핸들러 등록 없이 자동으로 이벤트 처리가 가능
 
-인라인 이벤트 핸들러 프로퍼티
+### 인라인 이벤트 핸들러 프로퍼티
 ```element.onclick```, ```element.onmouseover```
 
 |구분|```element.onclick = function(){}```|이벤트 위임 (주로 ```addEventListener``` 사용)|
@@ -71,7 +71,7 @@ oldElement.replaceWith(newElement);
 |적합한 상황|대상 요소가 적거나 변경이 거의 없을 때|동적 요소가 많거나 성능/메모리가 중요할 때|
 |event.target 활용|일반적으로 ```event.target```과 ```event.currentTarget```이 동일함|**```event.target```**을 사용하여 실제 이벤트 발생 요소를 구분하는 것이 핵심|
 
-모던 JS의 권장 방식
+### 모던 JS의 권장 방식
 - ```element.addEventListener('click', handlerFunction)```
 - 이 방식은 여러 개의 핸들러를 중복으로 등록할 수 있고, 이벤트 캡처링 단계에서 이벤트를 잡을지(```useCapture: true``` 옵션) 등을 세밀하게 제어할 수 있기 때문입니다.
 - 이벤트 위임은 이 ```addEventListener()``` 방식을 이용하여 상위 요소에 핸들러를 등록하고, 내부에서 ```event.target```을 활용하는 기법입니다.
