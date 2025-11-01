@@ -16,8 +16,8 @@
     function createButton(){
       // 사용자에게 변환할 태그명을 입력받는다
       const tagArea = prompt('변경할 태그를 입력하세요.(예: div, section, button, ...)');
-      // 허용 가능한 HTML 태그 목록 (기본 검증용)
-      const elementList = [
+      // 허용 가능한 HTML 태그 목록 (기본 검증용) - Set으로 빠른 검색
+      const elementList = new Set([
         'a',
         'abbr',
         'address',
@@ -131,7 +131,7 @@
         'var',
         'video',
         'wbr',
-      ];
+      ]);
       const wrapConverter = document.querySelector('.wrap_converter');
       // 변환을 실행할 버튼 노드
       const btnConverter = document.createElement('button');
@@ -142,7 +142,7 @@
       }
 
       // 입력한 태그가 허용 목록에 있을 때만 버튼 생성
-      if(elementList.includes(tagArea)){
+      if(elementList.has(tagArea)){
         btnConverter.textContent = tagArea;
         wrapConverter.appendChild(btnConverter).setAttribute('type', 'button');
         btnConverter.setAttribute('class', 'btn_converter');
@@ -260,6 +260,7 @@
 
       // 기존 텍스트 유지: 사용자가 text를 명시하지 않은 경우에만
       const userSpecifiedContent = attrs.hasOwnProperty('text');
+      // img도 아니고, input도 아닐 때
       if(!userSpecifiedContent && tagArea !== 'img' && tagArea !== 'input'){
         updatedTag.textContent = currentTag.textContent;
       }
