@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .ip_text{width:100%}
+    .wrap_keynumber{display:flex;align-items:center;}
+  </style>
+</head>
+<body>
+  <div class="wrap_write">
+    <input type="text" class="ip_text" readonly>
+  </div>
+  <div class="wrap_keynumber"></div>
+  <script>
+    const App = {
+      // random 숫자 생성
+      getRandomInt: function(count){
+        let numArr = [];
+        let randomNum;
+        
+        while (count > numArr.length){
+          randomNum = Math.floor(Math.random() * 10);
+          if(!numArr.includes(randomNum)){
+            numArr.push(randomNum);
+          }
+        }
+        this.createElements(numArr);
+      },
+
+      // 버튼 생성
+      createElements: function(numArr){
+        // console.log(numArr);
+        for(let i = 0; i < numArr.length; i++){
+          const element = document.createElement('button');
+          element.textContent = numArr[i];
+          element.setAttribute('type', 'button');
+          element.classList.add('btn_keynumber');
+          document.querySelector('.wrap_keynumber').appendChild(element);
+        }
+      },
+
+      // 디바운스 : 일정 시간 내에 여러번 호출되는 것을 막아주는 기능 ( 유사. throttle )
+      debounce: function(func, delay){
+        let timer;
+        return function(){
+          const args = arguments;
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            func.apply(this, args);
+          }, delay);
+        }
+      },
+
+      // 입력값 세팅
+      setInsert: function(e){
+        document.querySelector('.ip_text').setAttribute('readonly',true);
+        document.querySelector('.ip_text').value += e.target.textContent;
+      },
+
+      // 이벤트 연결
+      bindEvents: function(){
+        const wrapKeynumber = document.querySelector('.wrap_keynumber');
+        wrapKeynumber.addEventListener('keydown', function(e){
+          e.preventDefault();
+        });
+        wrapKeynumber.addEventListener('click', this.debounce(this.setInsert, 200));
+      },
+
+      // 초기화
+      init: function(){
+        this.getRandomInt(10);
+        this.bindEvents();
+      }
+    };
+
+    App.init();
+  </script>
+</body>
+</html>

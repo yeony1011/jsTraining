@@ -16,3 +16,9 @@
 - ```window.getSelection();```
 - ```window.getSelection().rangeCount```
 - ```window.getSelection().getRangeAt(index);```
+
+## STUDY
+
+## 구현완료
+- 역방향 처리때문에 크기를 비교해서 구현했는데, Math.min() Math.max() 를 사용하는게 더 깔끔했겠다 싶었습니다
+- HTML 태그로 감싸진 후, 초기화버튼을 넣어 원래상태로 노출되도록 구현해봤습니다
