@@ -13,6 +13,53 @@ One Day One JavaScript 3
 - 검색을 통해 스스로 해결하며, AI를 활용해 코드를 생성하거나 회신받는 행위는 금지한다.
 
 ## STUDY
+###[debouncing(디바운싱)과 throttling(쓰로틀링)](https://velog.io/@seoyaon/Javascript-%EB%94%94%EB%B0%94%EC%9A%B4%EC%8B%B1debouncing%EA%B3%BC-%EC%93%B0%EB%A1%9C%ED%8B%80%EB%A7%81throttling)
+ᄂ 프로그래밍 기법
+
+- debouncing(디바운싱)
+: 연이어 호출되는 함수들 중 마지막 함수(또는 제일 첫번째 함수)만 호출하도록 하는 것
+-> 이벤트 핸들러가 여러번 호출되는 것을 방지하고자 할 때 사용
+```
+window.addEventListener('input', debounce(function(e) {
+  console.log(e.target.value);
+}, 200));
+
+function debounce(func, delay) {
+  let timer;
+  return function() {
+    const args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  }
+}
+// 1. window 객체에 사용자가 입력할 때마다 발생하는 input 이벤트를 등록합니다.
+// 2. debounce 함수를 호출하여 input 이벤트가 발생할 때마다 실행되는 함수를 전달합니다.
+// 3. debounce 함수는 내부적으로 타이머를 실행하여 일정 시간(200ms)이 지난 후에 함수를 실행합니다. 타이머가 실행될 때마다 clearTimeout 함수를 사용하여 이전 타이머가 존재한다면 취소합니다.
+// 4. func.apply(this, args)를 호출하여 실제 실행될 함수를 실행합니다. 여기서는 e.target.value 값을 출력하는 함수가 실행됩니다.
+```
+
+throttling(쓰로틀링)
+: 일정 시간 동안 이벤트 핸들러를 한 번만 실행하도록 제어하는 것
+-> 일정 시간 동안 특정 이벤트가 연속해서 발생하더라도, 일정 주기마다 최대 한 번의 이벤트만 실행하고자 할 때 사용
+```
+window.addEventListener('input', throttle(function(e) {
+  console.log(e.target.value);
+}, 200));
+
+function throttle(func, delay) {
+  let timer;
+  return function() {
+    const args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  }
+}
+```
+
 
 ## 구현완료
 - debouncing와 throttling 개념에 대해 알게되었습니다

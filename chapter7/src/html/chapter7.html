@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-    .ip_text{width:100%}
+    .ip_text{width:50%}
     .wrap_keynumber{display:flex;align-items:center;}
   </style>
 </head>
@@ -17,28 +17,49 @@
   <script>
     const App = {
       // random 숫자 생성
-      getRandomInt: function(count){
+      // getRandomInt: function(count){
+      //   let numArr = [];
+      //   let randomNum;
+        
+      //   while (count > numArr.length){
+      //     randomNum = Math.floor(Math.random() * 10);
+      //     if(!numArr.includes(randomNum)){
+      //       numArr.push(randomNum);
+      //     }
+      //   }
+      //   this.createElements(numArr);
+      // },
+
+      getRandomInt: function(){
         let numArr = [];
         let randomNum;
         
-        while (count > numArr.length){
-          randomNum = Math.floor(Math.random() * 10);
-          if(!numArr.includes(randomNum)){
-            numArr.push(randomNum);
+        for(let i = 0; i < 3; i++){
+          numArr[i] = [];
+          for(let j = 0; j < 3; j++){
+            while(numArr[i][j] === null || typeof numArr[i][j] === 'undefined' || numArr[i][j] === ''){
+              randomNum = Math.floor(Math.random() * 9 + 1);
+              
+              if(!numArr.flat().includes(randomNum)){
+                numArr[i][j] = randomNum;
+              }
+            }
           }
         }
+
         this.createElements(numArr);
       },
 
       // 버튼 생성
       createElements: function(numArr){
-        // console.log(numArr);
-        for(let i = 0; i < numArr.length; i++){
-          const element = document.createElement('button');
-          element.textContent = numArr[i];
-          element.setAttribute('type', 'button');
-          element.classList.add('btn_keynumber');
-          document.querySelector('.wrap_keynumber').appendChild(element);
+        for(let i = 0; i < 3; i++){
+          for(let j = 0; j < 3; j++){
+            const element = document.createElement('button');
+            element.textContent = numArr[i][j];
+            element.setAttribute('type', 'button');
+            element.classList.add('btn_keynumber');
+            document.querySelector('.wrap_keynumber').appendChild(element);
+          }
         }
       },
 
@@ -71,7 +92,8 @@
 
       // 초기화
       init: function(){
-        this.getRandomInt(10);
+        // this.getRandomInt(10);
+        this.getRandomInt();
         this.bindEvents();
       }
     };
