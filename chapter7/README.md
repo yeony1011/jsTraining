@@ -1,9 +1,9 @@
-One Day One JavaScript 3
+# One Day One JavaScript 3
 
 다음 요구사항에 따라 **키보드 입력도구(Keyboard Input Tool)**를 구현하시오.
 화면에는 <input></input> 콘텐츠가 있으며, 페이지 로드 시, 0~9 숫자 버튼을 생성하여 랜덤 배치 한다 (3X3 배열)
 
-상세 요구사항
+## 상세 요구사항
 - 모든 동작은 순수 자바스크립트로 구현한다.
 - 콘텐츠 영역에는 <input type="text">이 존재한다.
 - 페이지 로드 시, 0~9 숫자를 무작위로 섞은 버튼 배열(3X3)을 생성한다. (예: <button>3</button>, <button>8</button>, <button>1</button>, <button>9</button>...)
