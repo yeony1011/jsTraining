@@ -29,11 +29,13 @@
         const fruitArr = ['banana', 'apple', 'orange', 'grape', 'pear', 'mango', 'peach', 'kiwi', 'pineapple', 'cherry'];
         const animalArr = ['monkey', 'lion', 'tiger', 'elephant', 'rabbit', 'zebra', 'dog', 'cat'];
         
-        this.allData = [
+        // 스프레드 연산자로 배열 합치고 Set으로 변환
+        // Set 사용 이유: has() 메서드로 O(1) 시간복잡도 검색 가능
+        this.allData = new Set([
           ...numberArr.map(num => num.toString()),
           ...fruitArr,
           ...animalArr
-        ];
+        ]);
         
         return this.allData;
       },
@@ -42,7 +44,8 @@
       searchData: function(e){
         const ipSearch = document.querySelector('.ip_search');
 
-        if(App.allData.includes(ipSearch.value)){
+        // Set.has() 메서드 사용 - O(1) 시간복잡도로 빠른 검색
+        if(App.allData.has(ipSearch.value)){
           alert(`검색어: ${ipSearch.value} 입니다!`);
         }else{
           alert('검색 결과가 없습니다. 제공되는 데이터에서 검색해주세요!');
