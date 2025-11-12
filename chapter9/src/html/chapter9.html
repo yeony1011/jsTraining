@@ -39,7 +39,7 @@
           ...animalArr
         ];
 
-        allRandomData = this.allData.sort(() => Math.random() - 0.5);
+        const allRandomData = this.allData.sort(() => Math.random() - 0.5);
         
         return allRandomData;
       },
@@ -47,6 +47,7 @@
       // 요소 생성 초기화
       initCreateElement: function(){
         const wrapSearch = document.querySelector('.wrap_search');
+        const allRandomData = this.initData();
         allRandomData.forEach((item) => {
           const element = document.createElement('div');
           element.textContent = item;
@@ -64,23 +65,23 @@
       // 데이터 검색
       searchData: function(){
         const ipSearch = document.querySelector('.ip_search');
+        
+        if(!this.isEmpty(ipSearch)) return;
 
-        if(!App.isEmpty(ipSearch)) return;
+        const value = App.transformLower(ipSearch.value.trim());
 
-        value = App.transformLower(ipSearch.value);
+        const matchedItem = App.allData.find((item) => {
+          return item === value;
+        });
 
         if(App.allData.includes(value)){
           // alert(`검색어: ${value} 입니다!`);
-          App.allData.filter((item) => {
-            if(item === value){
-              document.querySelector(`div[data-item="${item}"]`).classList.add('highlight');
-              App.resetData(ipSearch);
-            }
-          });
+          document.querySelector(`div[data-item="${matchedItem}"]`).classList.add('highlight');
         }else{
           alert('검색 결과가 없습니다. 제공되는 데이터에서 검색해주세요!');
-          App.resetData(ipSearch);
         }
+
+        App.resetData(ipSearch);
       },
 
       // 빈값 체크
@@ -102,15 +103,17 @@
       // 이벤트 연결
       bindEvents: function(){
         const btnSearch = document.querySelector('.btn_search');
-        btnSearch.addEventListener('click', this.searchData);
-
         const btnReset = document.querySelector('.btn_reset');
+        const ipSearch = document.querySelector('.ip_search');
+
+        btnSearch.addEventListener('click', () => {
+          this.searchData();
+        });
+        
         btnReset.addEventListener('click', () => {
-          const ipSearch = document.querySelector('.ip_search');
-          const highlight = document.querySelectorAll('.highlight');
-          App.resetData(ipSearch);
-          highlight.forEach((item) => {
-            item.classList.remove('highlight');
+          if(ipSearch) this.resetData(ipSearch);
+          document.querySelectorAll('.highlight').forEach((node) => {
+            node.classList.remove('highlight');
           });
         });
       },
