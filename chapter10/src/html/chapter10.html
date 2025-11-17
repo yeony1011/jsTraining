@@ -8,8 +8,13 @@
 <body>
   <div class="wrap_random">
     <div class="box_random"></div>
-    <input type="number" class="ip_length">
-    <button type="button" class="btn_random">난수 생성</button>
+    <div>
+      <label for="ipLength">난수 길이</label>
+      <input type="number" class="ip_length" id="ipLength">
+    </div>
+    <div class="box_btn">
+      <button type="button" class="btn_random" style="display:block;width:217px">난수 생성</button>
+    </div>
   </div>
   <script>
     const App = {
@@ -91,17 +96,44 @@
       // 난수 요소 출력
       randomCreate: function(codeLength){
         const boxRandom = document.querySelector('.box_random');
+        
         boxRandom.textContent = this.getRandomCode(codeLength);
+      },
+
+      // 요소 생성
+      createElements: function(config) {
+        const element = document.createElement(config.tag);
+        element.classList.add(config.className);
+        if (config.textCont) {
+          element.textContent = config.textCont;
+        }
+        if (config.attr) {
+          for (let key in config.attr) {
+            element.setAttribute(key, config.attr[key]);
+          }
+        }
+        return element;
       },
 
       // 이벤트 연결
       bindEvents: function(){
-        const btnRandom = document.querySelector('.btn_random');
+        const boxRandom = document.querySelector('.box_random');
+        const boxBtn = document.querySelector('.box_btn');
         const ipLength = document.querySelector('.ip_length');
+        const btnRandom = document.querySelector('.btn_random');
+        const btnChange = this.createElements({ 'tag': 'button', 'className': 'btn_change', 'attr': {'type': 'button', 'style': 'display:block;width:217px'}, textCont: '소문자 변환' });
 
         btnRandom.addEventListener('click', () => {
           if(!this.isEmpty(ipLength)) return;
+          
           this.randomCreate(ipLength.value);
+          boxBtn.appendChild(btnChange);
+        });
+
+        boxBtn.addEventListener('click', (e) => {
+          if(e.target.classList.contains('btn_change')){
+            boxRandom.textContent = boxRandom.textContent.toLowerCase();
+          }
         });
       },
 
