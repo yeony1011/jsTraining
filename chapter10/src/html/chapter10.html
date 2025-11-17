@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="wrap_random">
+    <div class="box_random"></div>
+    <input type="number" class="ip_length">
+    <button type="button" class="btn_random">난수 생성</button>
+  </div>
+  <script>
+    const App = {
+      // 빈값 체크
+      isEmpty: function(element){
+        if (!element.value.trim()) {
+          alert('값이 비어있습니다');
+          App.resetData(element);
+          return false;
+        } else {
+          return true;
+        }
+      },
+
+      // 데이터 초기화
+      resetData: function(element){
+        element.focus();
+        element.value = '';
+      },
+
+      // 난수 알파벳 대문자 배열 생성
+      getRandomString: function(){
+        let charCodeArr = [];
+
+        for(let i = 0; i <= 90 - 65; i++){
+          charCodeArr[i] = String.fromCharCode(65 + i);
+        }
+
+        const alphabetArr = charCodeArr.sort(() => Math.random() - 0.5);
+
+        return alphabetArr;
+      },
+
+      // 난수 숫자배열 생성
+      getRandomInt: function(count){
+        let numArr = [];
+        let randomNum;
+        
+        while (count > numArr.length){
+          randomNum = Math.floor(Math.random() * 10);
+          if(!numArr.includes(randomNum)){
+            numArr.push(randomNum);
+          }
+        }
+
+        return numArr;
+      },
+
+      // random 숫자 생성
+      getRandomCode: function(count){
+        const ipLength = document.querySelector('.ip_length');
+        const numArr = this.getRandomInt(10);
+        const alphabetArr = this.getRandomString();
+
+        let code = '';
+
+        if(count == '0'){
+          alert('0이상의 숫자를 입력해주세요');
+          this.resetData(ipLength);
+          return;
+        }
+        if(count <= '10'){
+          alert('10미만의 숫자를 입력해주세요');
+          this.resetData(ipLength);
+          return;
+        }
+
+        for(let i = 0; i < count; i++){
+          if(i == 0 || i == 3){
+            code += alphabetArr[i];
+          }else{
+            code += numArr[i];
+          }
+        }
+
+        return code;
+      },
+
+      // 난수 요소 출력
+      randomCreate: function(codeLength){
+        const boxRandom = document.querySelector('.box_random');
+        boxRandom.textContent = this.getRandomCode(codeLength);
+      },
+
+      // 이벤트 연결
+      bindEvents: function(){
+        const btnRandom = document.querySelector('.btn_random');
+        const ipLength = document.querySelector('.ip_length');
+
+        btnRandom.addEventListener('click', () => {
+          if(!this.isEmpty(ipLength)) return;
+          this.randomCreate(ipLength.value);
+        });
+      },
+
+      // 로드시 초기 세팅
+      init: function(){
+        this.bindEvents();
+      }
+    };
+
+    App.init();
+  </script>
+</body>
+</html>
