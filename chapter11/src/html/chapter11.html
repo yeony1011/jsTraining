@@ -18,6 +18,9 @@
   </div>
   <script>
     const App = {
+      // 난수 코드 배열로 저장 - 초기화 시 한 번만 생성
+      codeArr: [],
+
       // 빈값 체크
       isEmpty: function(element){
         if (!element.value.trim()) {
@@ -71,33 +74,47 @@
 
         let code = '';
 
-        if(count == '0'){
-          alert('0이상의 숫자를 입력해주세요');
+        if(Number(count) < 4){
+          alert('최소 4이상의 숫자를 입력해주세요');
           this.resetData(ipLength);
           return;
         }
-        if(count <= '10'){
+        if(Number(count) >= 10){
           alert('10미만의 숫자를 입력해주세요');
           this.resetData(ipLength);
           return;
         }
 
-        for(let i = 0; i < count; i++){
-          if(i == 0 || i == 3){
-            code += alphabetArr[i];
-          }else{
-            code += numArr[i];
-          }
+        const randomArr = [
+          ...numArr,
+          ...alphabetArr
+        ].sort(() => Math.random() - 0.5);
+
+        for(let i = 0; i < Number(count); i++){
+          code += randomArr[i];
         }
 
-        return code;
+        return this.getCodeDuplicate(code);
+      },
+
+      // code 배열 (중복 체크)
+      getCodeDuplicate: function(code){
+        if(!this.codeArr.includes(code)){
+          this.codeArr.push(code);
+        }else{
+          alert('중복된 코드입니다. 다시 생성해주세요.');
+          return;
+        }
+        
+        return this.codeArr;
       },
 
       // 난수 요소 출력
       randomCreate: function(codeLength){
         const boxRandom = document.querySelector('.box_random');
+        const printCodeArr = this.getRandomCode(codeLength);
         
-        boxRandom.textContent = this.getRandomCode(codeLength);
+        boxRandom.textContent = printCodeArr;
       },
 
       // 요소 생성
