@@ -38,6 +38,33 @@
         element.value = '';
       },
 
+      // 요소 생성
+      createElements: function(config) {
+        const element = document.createElement(config.tag);
+
+        element.classList.add(config.className);
+
+        if (config.textCont) {
+          element.textContent = config.textCont;
+        }
+        if (config.attr) {
+          // AS-IS ( for...in문 )
+          // 상속된 속성까지 반복할 위험, 키만 가져옴, 전통적
+          // for (let key in config.attr) {
+          //   element.setAttribute(key, config.attr[key]);
+          // }
+
+          // TO-BE ( Object.entries(), forEach() )
+          // Object.entries()로 [키, 값] 쌍의 배열을 얻어 forEach로 반복
+          // 객체 고유의 속성만 반복해 안전, key와 value를 동시에 구조 분해 할당으로 사용 가능, 함수형 스타일과 의도 명확
+          Object.entries(config.attr).forEach(([key, value]) => {
+            element.setAttribute(key, value);
+          });
+        }
+
+        return element;
+      },
+
       // 난수 알파벳 대문자 배열 생성
       getRandomString: function(){
         let charCodeArr = [];
@@ -52,11 +79,11 @@
       },
 
       // 난수 숫자배열 생성
-      getRandomInt: function(count){
+      getRandomInt: function(maxCount = 10){
         let numArr = [];
         let randomNum;
         
-        while (count > numArr.length){
+        while (maxCount > numArr.length){
           randomNum = Math.floor(Math.random() * 10);
           if(!numArr.includes(randomNum)){
             numArr.push(randomNum);
@@ -68,31 +95,24 @@
 
       // random 코드 생성
       getRandomCode: function(count){
-        const ipLength = document.querySelector('.ip_length');
-        const numArr = this.getRandomInt(10);
+        const numArr = this.getRandomInt();
         const alphabetArr = this.getRandomString();
-
-        let code = '';
-
-        if(Number(count) < 4){
-          alert('최소 4이상의 숫자를 입력해주세요');
-          this.resetData(ipLength);
-          return;
-        }
-        if(Number(count) >= 10){
-          alert('10미만의 숫자를 입력해주세요');
-          this.resetData(ipLength);
-          return;
-        }
-
+        
         const randomArr = [
           ...numArr,
           ...alphabetArr
         ].sort(() => Math.random() - 0.5);
 
-        for(let i = 0; i < Number(count); i++){
-          code += randomArr[i];
-        }
+        // AS-IS ( for문 )
+        // let code = '';
+        // for(let i = 0; i < Number(count); i++){
+        //   code += randomArr[i]; // 문자열 결합은 성능상 비효율적!
+        // }
+
+        // TO-BE ( slide(), join() 배열메서드 )
+        // 배열의 앞부분을 잘라 바로 문자열로 합침!
+        // ex) 'U', 'X', '1', 'R' -> 'UX1R'
+        const code = randomArr.slice(0, Number(count)).join('');
 
         return this.getCodeDuplicate(code);
       },
@@ -103,7 +123,9 @@
           this.codeArr.push(code);
         }else{
           alert('중복된 코드입니다. 다시 생성해주세요.');
-          return;
+          return null;
+          // 코드가 성공적으로 생성되었는지 아닌지를 호출하는 쪽(randomCreate)에서 쉽게 알 수 있도록, 실패 시에는 항상 null 또는 false 같은 명확한 값을 반환하도록 통일하는게 좋다!
+          // return; 만 하면 undefined로 반환되기 때문에!
         }
         
         return this.codeArr;
@@ -114,22 +136,11 @@
         const boxRandom = document.querySelector('.box_random');
         const printCodeArr = this.getRandomCode(codeLength);
         
-        boxRandom.textContent = printCodeArr;
-      },
-
-      // 요소 생성
-      createElements: function(config) {
-        const element = document.createElement(config.tag);
-        element.classList.add(config.className);
-        if (config.textCont) {
-          element.textContent = config.textCont;
+        // printCodeArr이 null 인지 체크
+        // 만약 중복으로 코드가 생성되지 않았을 경우, 화면을 비우거나 기존 값을 유지!
+        if(printCodeArr){
+          boxRandom.textContent = printCodeArr;
         }
-        if (config.attr) {
-          for (let key in config.attr) {
-            element.setAttribute(key, config.attr[key]);
-          }
-        }
-        return element;
       },
 
       // 이벤트 연결
@@ -141,7 +152,20 @@
         const btnChange = this.createElements({ 'tag': 'button', 'className': 'btn_change', 'attr': {'type': 'button', 'style': 'display:block;width:217px'}, textCont: '소문자 변환' });
 
         btnRandom.addEventListener('click', () => {
+          // 유효성 검사 시작
           if(!this.isEmpty(ipLength)) return;
+
+          if(Number(ipLength.value) < 4){
+            alert('최소 4이상의 숫자를 입력해주세요');
+            this.resetData(ipLength);
+            return;
+          }
+          if(Number(ipLength.value) >= 10){
+            alert('10미만의 숫자를 입력해주세요');
+            this.resetData(ipLength);
+            return;
+          }
+          // 유효성 검사 끝
           
           this.randomCreate(ipLength.value);
           boxBtn.appendChild(btnChange);
