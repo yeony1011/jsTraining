@@ -1,4 +1,4 @@
-One Day One JavaScript 4
+# One Day One JavaScript 4
 
 다음 요구사항에 따라 **배열 조회기(Array Finder)**를 구현하시오.
 코드에는 임의 배열이 존재하며, 사용자가 입력한 특정 문자 또는 숫자열이 해당 배열에 포함되어 있는지를 조회하고 그 결과를 화면에 출력한다.
@@ -6,11 +6,43 @@ One Day One JavaScript 4
 ## 상세 요구사항
 - 모든 동작은 순수 자바스크립트로 구현한다.
 - 페이지 로드 시, 임의의 배열(문자 또는 숫자 혼합 가능)을 생성한다. (예: ["apple", "banana", "cherry", 100, 200, "grape"])
-- <input> 입력창 또는 prompt 호출을 통해 검색할 값(문자 또는 숫자)을 입력한다.
+- ```<input>``` 입력창 또는 prompt 호출을 통해 검색할 값(문자 또는 숫자)을 입력한다.
 - ‘조회’ 버튼 클릭 시, 배열에 해당 값이 존재하면 “true” 존재하지 않으면 “false” 결과를 출력한다.
 - 검색을 통해 스스로 해결하며, AI를 활용해 코드를 생성하거나 회신받는 행위는 금지한다.
 
 ## STUDY
+### 배열합치기
+1. concat()
+```
+const arr1 = ['a', 'b', 'c'];
+const arr2 = ['1', '2', '3'];
+const arr3 = arr1.concat(arr2);
+console.log(arr3);
+```
+출력 : ['a', 'b', 'c', '1', '2', '3']
+
+2. spread 연산자
+```
+const arr1 = ['a', 'b', 'c'];
+const arr2 = ['1', '2', '3'];
+const arr3 = [...arr1, ...arr2];
+console.log(arr3);
+```
+출력 : ['a', 'b', 'c', '1', '2', '3']
+
+3. push()
+```
+const arr1 = ['a', 'b', 'c'];
+const arr2 = ['1', '2', '3'];
+const arr3 = [];
+const arr4 = [];
+arr3.push(...arr1);
+arr3.push(...arr2);
+arr4.push(arr1);
+arr4.push(arr2);
+console.log(arr3, arr4);
+```
+출력 : ['a', 'b', 'c', '1', '2', '3'], [['a', 'b', 'c'], ['1', '2', '3']]
 
 
 ## 구현완료
