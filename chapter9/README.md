@@ -1,10 +1,10 @@
-One Day One JavaScript 5
+# One Day One JavaScript 5
 
 다음 요구사항에 따라 **배열 매칭 UI 갱신기(Array Match & UI Updater)**를 구현하시오.
 화면에는 임의로 생성된 배열 데이터가 있으며, 각 배열 요소에 대응되는 HTML 엘리먼트가 화면에 표시된다.
 사용자가 특정 값을 입력하고 조회 버튼을 클릭하면, 입력값이 배열에 존재할 경우 해당 dataset 속성값이 일치하는 엘리먼트의 UI가 갱신되어야 한다.
 
-상세 요구사항
+## 상세 요구사항
 - 모든 동작은 순수 자바스크립트로 구현한다.
 - 페이지 로드 시, 임의의 배열(문자 또는 숫자 혼합 가능)을 생성한다. (예: ["apple", "banana", "cherry", 100, 200, "grape"])
 - 배열의 각 요소에 대응되는 HTML 엘리먼트를 화면에 출력한다. (예: ```<div data-item="apple">apple</div> <div data-item="banana">banana</div>```...)
