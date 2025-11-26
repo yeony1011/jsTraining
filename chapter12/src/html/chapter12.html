@@ -21,25 +21,13 @@
       // 초기 저장할 변수 세팅
       boxRandom: null,
       btnRandom: null,
-      item: null,
-
-      // get content
-      getCont: function(){
-        const elementArr = [];
-
-        this.item.forEach((element) => {
-          elementArr.push(element);
-        });
-
-        return elementArr;
-      },
+      itemsArr: [], // NodeList 가 아닌, 순수 배열로 저장해둘 공간
 
       // 랜덤 출력
       setRandom: function(){
-        const elementArr = this.getCont();
-        const newElementArr = elementArr.sort(() => Math.random() - 0.5);
+        const randomArr = this.itemsArr.sort(() => Math.random() - 0.5);
 
-        newElementArr.forEach((element) => {
+        randomArr.forEach((element) => {
           this.boxRandom.appendChild(element);
         });
       },
@@ -56,6 +44,11 @@
         this.boxRandom = document.querySelector('.box_random');
         this.btnRandom = document.querySelector('.btn_random');
         this.item = this.boxRandom.querySelectorAll('div');
+
+        // 처음 한번만 요소를 찾아 배열로 변환해 저장해둠
+        // Array.from() : NodeList를 진짜 배열로 바꿔주는 문법
+        const nodeList = this.boxRandom.querySelectorAll('div');
+        this.itemsArr = Array.from(nodeList);
 
         this.setRandom();
         this.bindEvents();
