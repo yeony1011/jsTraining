@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="wrap_random">
+    <div class="box_random">
+      <div class="item1">a</div>
+      <div class="item2">b</div>
+      <div class="item3">c</div>
+      <div class="item4">d</div>
+      <div class="item5">e</div>
+    </div>
+    <button type="button" class="btn_random">랜덤버튼</button>
+  </div>
+  <script>
+    const App = {
+      // 초기 저장할 변수 세팅
+      boxRandom: null,
+      btnRandom: null,
+      item: null,
+
+      // get content
+      getCont: function(){
+        const elementArr = [];
+
+        this.item.forEach((element) => {
+          elementArr.push(element);
+        });
+
+        return elementArr;
+      },
+
+      // 랜덤 출력
+      setRandom: function(){
+        const elementArr = this.getCont();
+        const newElementArr = elementArr.sort(() => Math.random() - 0.5);
+
+        newElementArr.forEach((element) => {
+          this.boxRandom.appendChild(element);
+        });
+      },
+
+      // 이벤트 연결
+      bindEvents: function(){
+        this.btnRandom.addEventListener('click', () => {
+          this.setRandom();
+        });
+      },
+
+      // 로드시 초기 세팅
+      init: function(){
+        this.boxRandom = document.querySelector('.box_random');
+        this.btnRandom = document.querySelector('.btn_random');
+        this.item = this.boxRandom.querySelectorAll('div');
+
+        this.setRandom();
+        this.bindEvents();
+      }
+    };
+
+    App.init();
+  </script>
+</body>
+</html>
