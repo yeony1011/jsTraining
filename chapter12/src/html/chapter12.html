@@ -27,9 +27,20 @@
       setRandom: function(){
         const randomArr = this.itemsArr.sort(() => Math.random() - 0.5);
 
+        // AS-IS
+        // randomArr.forEach((element) => {
+        //   this.boxRandom.appendChild(element);
+        // });
+
+        // TO-BE
+        // DocumentFragment 생성( 가상의 빈 껍데기 )
+        // fragment에 요소를 차곡차곡 담고 ( 실제 화면이 변하지 않음 )
+        // 완성된 fragment를 실제 화면에 한번에 출력
+        const fragment = document.createDocumentFragment();
         randomArr.forEach((element) => {
-          this.boxRandom.appendChild(element);
+          fragment.appendChild(element);
         });
+        this.boxRandom.appendChild(fragment);
       },
 
       // 이벤트 연결
