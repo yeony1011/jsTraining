@@ -25,3 +25,5 @@
 
 
 ## 구현완료
+- 8차 과제를 활용해 querySelectorAll 를 children으로 변경해 어려움 없이 진행했습니다
+- 다른분들 댓글에서 Fisher-Yaates Shuffle을 많이 사용하셨길래 찾아보고 변경해보았습니다. sort사용할때와 Fisher-Yaates Shuffle를 사용할때의 차이점을 알게되었습니다
