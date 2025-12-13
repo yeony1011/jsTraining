@@ -89,7 +89,7 @@
           this.setRandomPrint();
         });
 
-        this.tabArr.forEach((btn) => {
+        this.tabsArr.forEach((btn) => {
           btn.addEventListener('click', () => {
             const dataItem = Number(btn.getAttribute('data-item'));
             const target = this.elementsArr.find(element => Number(element.getAttribute('data-item')) === dataItem);
