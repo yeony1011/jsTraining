@@ -61,9 +61,10 @@
       scrollDisplay: function(targetElement){
         this.elementsArr.forEach((element) => {
           if(element === targetElement){
+            this.tabsArr.find((tab) => {tab.getAttribute('data-item') == targetElement.getAttribute('data-item') ? tab.classList.add('on') : tab.classList.remove('on')});
             element.classList.add('on');
             window.scrollTo({
-              top: element.offsetTop - 40, // box_tab 높이만큼 여유공간 확보
+              top: element.offsetTop - this.boxTab.offsetHeight,
               behavior: 'smooth'
             });
           }else{
