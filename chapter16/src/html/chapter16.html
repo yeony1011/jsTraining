@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body{margin:0}
+
+    .wrap_random{padding:0 10px}
+    
+    .box_tab{position:fixed;top:0;left:0;right:0;padding:10px 70px 10px 10px;background-color:#fff}
+    .box_tab .item1.on{background-color:yellowgreen}
+    .box_tab .item2.on{background-color:gold}
+    .box_tab .item3.on{background-color:skyblue}
+    
+    .box_element{padding-top:40px}
+    .box_element .item1{height:600px;background-color:yellowgreen}
+    .box_element .item2{height:500px;background-color:gold}
+    .box_element .item3{height:700px;background-color:skyblue}
+
+    .btn_random{position:fixed;top:10px;right:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap_random">
+    <div class="box_tab">
+      <button type="button" class="item1" data-item="1">a</button>
+      <button type="button" class="item2" data-item="2">b</button>
+      <button type="button" class="item3" data-item="3">c</button>
+    </div>
+    <div class="box_element">
+      <div class="item1" data-item="1">a</div>
+      <div class="item2" data-item="2">b</div>
+      <div class="item3" data-item="3">c</div>
+    </div>
+    <button type="button" class="btn_random">랜덤버튼</button>
+  </div>
+  <script>
+    const App = {
+      // 초기 저장할 변수 세팅
+      boxTab: null,
+      boxElement: null,
+      btnRandom: null,
+      elementsArr: [], // NodeList 가 아닌, 순수 배열로 저장해둘 공간 (element)
+      tabsArr: [], // NodeList 가 아닌, 순수 배열로 저장해둘 공간 (tab)
+      tabNewArr: [],
+
+      // 요소 표시 업데이트 함수화 
+      updateDisplay: function(targetElement){
+        this.elementsArr.forEach((element) => {
+          if(element === targetElement){
+            element.classList.add('on');
+          }else{
+            element.classList.remove('on');
+          }
+        });
+      },
+
+      // 요소 스크롤 업데이트 함수화
+      scrollDisplay: function(targetElement){
+        this.elementsArr.forEach((element) => {
+          if(element === targetElement){
+            element.classList.add('on');
+            window.scrollTo({
+              top: element.offsetTop - 40, // box_tab 높이만큼 여유공간 확보
+              behavior: 'smooth'
+            });
+          }else{
+            element.classList.remove('on');
+          }
+        });
+      },
+
+      // 순서 랜덤 변경
+      setOrderChange: function(){
+        for (let i = this.elementsArr.length -1; i > 0; i--) {
+          let j = Math.floor(Math.random() * (i+1));
+          let k = this.elementsArr[i];
+          this.elementsArr[i] = this.elementsArr[j];
+          this.elementsArr[j] = k;
+        }
+
+        this.tabNewArr = []; // 초기화 ( 랜덤 버튼 클릭시, 탭이 수십개가 쌓여 화면에 탭이 계속 중복 추가되는 것을 방지 )
+
+        this.elementsArr.forEach((element) => {
+          this.tabsArr.filter((tab) => { 
+            element.getAttribute('data-item') == tab.getAttribute('data-item') ? this.tabNewArr.push(tab) : false;
+          });
+        });
+      },
+
+      // 랜덤 출력
+      setRandomPrint: function(){
+        this.setOrderChange();
+
+        const fragmentElement = document.createDocumentFragment();
+        const fragmentTab = document.createDocumentFragment();
+
+        this.tabNewArr.forEach((tab) => {
+          fragmentTab.appendChild(tab);
+        });
+        this.elementsArr.forEach((element) => {
+          fragmentElement.appendChild(element);
+        });
+
+        this.boxTab.appendChild(fragmentTab);
+        this.boxElement.appendChild(fragmentElement);
+
+        // 첫 번째 요소만 보이도록 업데이트
+        this.updateDisplay(this.elementsArr[0]);
+      },
+
+      // 이벤트 연결
+      bindEvents: function(){
+        this.btnRandom.addEventListener('click', () => {
+          this.setRandomPrint();
+        });
+
+        this.tabsArr.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const dataItem = Number(btn.getAttribute('data-item'));
+            const target = this.elementsArr.find(element => Number(element.getAttribute('data-item')) === dataItem);
+            // this.updateDisplay(target);
+            this.scrollDisplay(target);
+          });
+        });
+      },
+
+      // 로드시 초기 세팅
+      init: function(){
+        this.boxTab = document.querySelector('.box_tab');
+        this.boxElement = document.querySelector('.box_element');
+        this.btnRandom = document.querySelector('.btn_random');
+
+        // 처음 한번만 요소를 찾아 배열로 변환해 저장해둠
+        // Array.from() : NodeList를 진짜 배열로 바꿔주는 문법
+        this.elementsArr = Array.from(this.boxElement.children);
+        this.tabsArr = Array.from(this.boxTab.children);
+
+        this.setRandomPrint();
+        this.bindEvents();
+      }
+    };
+
+    App.init();
+  </script>
+</body>
+</html>
