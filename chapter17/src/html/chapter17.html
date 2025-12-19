@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #imageInput{width:100%;background-color:#ddd;}
+
+    #preview{margin:10px 0;background-color:antiquewhite}
+    #preview img{border-radius:3px}
+
+    #list{margin:10px 0;background-color:slategray}
+    #list img{border-radius:3px;cursor:pointer}
+    #list img + img{margin-left:5px}
+  </style>
+</head>
+<body>
+  <input type="file" id="imageInput" accept="image/*" multiple><!-- accept="image/*" : 표준 이미지 형식만 받음 -->
+  <div id="list"></div>
+  <div id="preview"></div>
+  <button type="button" class="btn_random">랜덤버튼</button>
+  <script>
+    const App = {
+      // 초기 저장할 변수 세팅
+      boxElement: null,
+      btnRandom: null,
+      elementsArr: [], // NodeList 가 아닌, 순수 배열로 저장해둘 공간 (element)
+      tabsArr: [], // NodeList 가 아닌, 순수 배열로 저장해둘 공간 (tab)
+      tabNewArr: [],
+      imgArr: [],
+
+      // 순서 랜덤 변경
+      setOrderChange: function(){
+        for (let i = this.imgArr.length -1; i > 0; i--) {
+          let j = Math.floor(Math.random() * (i+1));
+          let k = this.imgArr[i];
+          this.imgArr[i] = this.imgArr[j];
+          this.imgArr[j] = k;
+        }
+      },
+
+      // 랜덤 출력
+      setRandomPrint: function(){
+        this.setOrderChange();
+
+        const fragmentTab = document.createDocumentFragment();
+
+        for(const value of Object.values(this.imgArr)){
+          const imgElement = document.createElement("img");
+          imgElement.setAttribute('style', 'width:50px');
+          imgElement.setAttribute('src', value.result);
+          fragmentTab.appendChild(imgElement);
+        };
+        
+        this.list.replaceChildren();
+        this.list.appendChild(fragmentTab);
+
+        this.preview.replaceChildren();
+      },
+
+      // 파일 핸들링 ( File API : 객체 URL을 사용해 이미지 표시하기 )
+      handleFiles: function(files){
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+
+          if (!file.type.startsWith("image/")) {
+            continue;
+          }
+
+          const img = document.createElement("img");
+          img.setAttribute('style', 'width:50px');
+          img.file = file;
+
+          this.list.appendChild(img);
+
+          const reader = new FileReader();
+          reader.onload = (function (aImg) {
+            return function (e) {
+              aImg.src = e.target.result;
+            };
+          })(img);
+          reader.readAsDataURL(file);
+          
+          this.imgArr.push(reader);
+        }
+      },
+
+      // 이벤트 연결
+      bindEvents: function(){
+        this.imageInput.addEventListener('change', () => {
+          this.tabsArr = this.imageInput.files;
+          this.handleFiles(this.tabsArr);
+        });
+
+        this.list.addEventListener('click', (e) => {
+          this.preview.innerHTML = '';
+
+          if(e.target.nodeName === 'IMG'){
+            const preview = document.createElement("img");
+            preview.setAttribute('src', e.target.src);
+            preview.setAttribute('style', 'width:200px');
+            this.preview.appendChild(preview);
+          }
+
+          if(this.preview.children.length > 0){
+            const btnDelete = document.createElement("button");
+            btnDelete.setAttribute('type', 'button');
+            btnDelete.textContent = '삭제하기';
+            this.preview.appendChild(btnDelete);
+          }
+        });
+
+        this.preview.addEventListener('click', (e) => {
+          if(e.target.nodeName === 'BUTTON'){
+            this.preview.replaceChildren();
+            // const src = this.preview.children.getAttribute('src');
+            
+          }
+        });
+
+        this.btnRandom.addEventListener('click', () => {
+          if(this.list.children.length > 0){
+            this.setRandomPrint();
+          }else{
+            alert('파일을 선택해주세요');
+          }
+        });
+      },
+
+      // 로드시 초기 세팅
+      init: function(){
+        this.btnRandom = document.querySelector('.btn_random');
+        this.imageInput = document.querySelector('#imageInput');
+        this.list = document.querySelector('#list');
+        this.preview = document.querySelector('#preview');
+
+        this.bindEvents();
+      }
+    };
+
+    App.init();
+  </script>
+</body>
+</html>
