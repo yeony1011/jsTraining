@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <title>Document</title>
+  <style>
+    input{display:block;width:100%;border:1px solid #ddd;box-sizing:border-box}
+    table{border-collapse:collapse;width:100%;margin-top:20px}
+    th, td{border:1px solid #ddd;text-align:left}
+    th span, td span{display:block;padding:8px}
+    th{background-color:#f2f2f2;font-weight:bold}
+  </style>
+</head>
+<body>
+  <input type="file" id="fileInput" accept=".xls,.xlsx,.csv">
+  <div id="preview"></div>
+  <button id="downloadBtn">다운로드</button>
+  <script>
+    let data;
+    let globalJsonData = [];
+    let originFileName = '';
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      // 1. 화면에 그려진 테이블 요소를 찾습니다.
+      const tableElt = document.getElementById('preview').querySelector('table');
+
+      // 2. 테이블이 없으면 경고
+      if (!tableElt) {
+        alert('엑셀 파일을 먼저 업로드해주세요.');
+        return;
+      }
+      // exportJsonToExcel(globalJsonData);
+
+      // 3. HTML 테이블을 그대로 읽어서 워크북(엑셀 데이터)으로 변환
+      // 이 함수가 화면에 보이는 텍스트(수정된 내용)를 그대로 가져갑니다.
+      const workbook = XLSX.utils.table_to_book(tableElt, { sheet: "Sheet1" });
+
+      // 3-1. 파일명 변경
+      let newFileName = '수정본.xlsx';
+      const lastDotIndex = originFileName.lastIndexOf('.'); // 파일명에서 마지막 점(.)의 위치를 찾음
+      if(lastDotIndex !== -1){
+        // 확장자를 제외한 이름만 추출
+        const namePart = originFileName.substring(0, lastDotIndex);
+        // 뒤에 _수정본.xlsx 셋으로 추가
+        newFileName = `${namePart}_수정본.xlsx`;
+      }else{
+        // 확장자가 없는 경우
+        newFileName = `${originFileName}_수정본.xlsx`;
+      }
+
+      // 4. 파일 다운로드
+      XLSX.writeFile(workbook, newFileName);
+    });
+
+    // [방법1] html 테이블을 엑셀 파일로 다운로드하는 함수
+    function exportTableToExcel() {
+      const tableElement = document.getElementById('preview').querySelector('table');
+
+      // 2. Create a workbook object from the HTML table
+      // The table_to_book utility reads the data and generates a workbook
+      const workbook = XLSX.utils.table_to_book(tableElement);
+
+      // 3. Write the workbook and trigger the file download
+      // The first argument is the workbook object
+      // The second argument is the desired file name
+      XLSX.writeFile(workbook, 'exportTableToExcel.xlsx');
+    }
+
+    // [방법2] json 데이터를 엑셀 파일로 다운로드하는 함수
+    function exportJsonToExcel(jsonData) {
+      // 1. Create a new blank workbook
+      const workbook = XLSX.utils.book_new();
+
+      // 2. Create a worksheet from JSON data
+      const worksheet = XLSX.utils.json_to_sheet(jsonData);
+
+      // 3. Add the worksheet to the workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+      // 4. Write the workbook and trigger the file download
+      XLSX.writeFile(workbook, 'exportJsonToExcel.xlsx');
+  }
+
+
+
+    // 1. 파일 선택 이벤트 리스너 등록
+    document.getElementById('fileInput').addEventListener('change', handleFile);
+
+    function handleFile(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      originFileName = file.name;
+
+      reader.onload = function (e) {
+        // 1. 파일 데이터 가져오기 (ArrayBuffer 형태)
+        const data = e.target.result;
+
+        // 2. SheetJS(XLSX)를 사용하여 엑셀 데이터 파싱
+        // 'array' 타입으로 읽겠다고 명시해야 합니다.
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        // 3. 엑셀 파일의 첫 번째 시트 이름 가져오기
+        const firstSheetName = workbook.SheetNames[0];
+
+        // 4. 해당 시트의 데이터 가져오기
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // 5. 시트 데이터를 JSON(자바스크립트 객체) 형태로 변환
+        // 엑셀의 1행을 키(Key)로, 나머지 행을 값(Value)으로 변환해줍니다.
+        // const jsonData = XLSX.utils.sheet_to_json(worksheet); // 기본
+
+        jsonData = XLSX.utils.sheet_to_json(worksheet, {
+          raw: false, // 날짜 데이터를 '2024-01-01' 형식의 문자열로 변환
+          dateNF: 'yyyy-mm-dd', // 날짜 형식 지정
+        });
+
+        globalJsonData = jsonData;
+
+        // 6. HTML 테이블 생성 함수 호출 (직접구현방식 : 셀병합 미지원)
+        // renderTable(jsonData);
+        // console.log('엑셀 변환 결과:', jsonData);
+
+        // 6. json변환 대신 SheetJS의 유틸리티 함수를 사용하여 HTML 테이블 생성 (셀병합 지원)
+        const htmlStr = XLSX.utils.sheet_to_html(worksheet, {
+          editable: true,   // 사용자가 수정할 수 있도록 허용
+          id: "data-table"  // 테이블에 ID 부여 (선택사항)
+        });
+        // editable: true -> 테이블 내 수정 가능
+
+        // 7. 생성된 HTML 테이블을 미리보기 영역에 삽입
+        document.getElementById('preview').innerHTML = htmlStr;
+      };
+
+      reader.onerror = function (e) {
+        console.error('파일 읽기 오류 : ', e.target.error);
+      }
+
+      // reader.readAsText(file); // 'UTF-8', 'EUC-KR' 등 인코딩 지정 가능 (디폴트 : 'UTF-8')
+      // 엑셀은 데이터라 readAsText() 대신 readAsArrayBuffer() 사용해야함
+
+      reader.readAsArrayBuffer(file);
+      
+      // readAsText() : 파일의 내용을 텍스트 문자열로 읽음 -> 파일 내용 result 속성에 문자열로 저장
+      // readAsDataURL() : 파일 내용을 데이터 URL로 읽음 -> 데이터 URL 표현으로 변환
+      // readAsArrayBuffer() : 파일 내용을 배열버퍼로 읽음 -> 바이너리 데이터 조작에 유용
+      // readAsBinaryString() : 파일 내용을 이진 문자열로 읽음 -> 바이너리 데이터를 문자열로 표현
+    }
+  </script>
+</body>
+</html>
