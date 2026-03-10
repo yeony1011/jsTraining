@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .ip_date{width:200px}
+  </style>
+</head>
+<body>
+  <input type="text" class="ip_date" placeholder="YYYY-MM-DD HH:MM:SS" pattern="\d{4}-\d{2}-\d{2} \d[0-9]{2}:\d[0-9]{2}:\d[0-9]{2}">
+  <button type="button" class="btn_validate">날짜 검사하기</button>
+  <script>
+    const App = {
+      // 빈값 체크
+      isEmpty: function(element){
+        if (!element.value.trim()) {
+          alert('값이 비어있습니다');
+          App.resetData(element);
+          return false;
+        } else {
+          return true;
+        }
+      },
+
+      // 데이터 초기화
+      resetData: function(element){
+        element.focus();
+        element.value = '';
+      },
+
+      // 날짜 형태 검사
+      chkValidate: function(dateElement){
+        const regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+        
+        if(!this.isEmpty(dateElement)) return;
+
+        if(!regExp.test(dateElement.value)){
+          alert('잘못된 형식의 날짜 형식입니다');
+          App.resetData(dateElement);
+          return false;
+        }
+
+        this.chkDate(dateElement.value);
+      },
+
+      // 실제 날짜 존재 여부 검사
+      chkDate: function(dataString){
+        // 1차 작성 - 날짜를 통째로 문자열로 넣는 방식은 브라우저마다 해석 방식이 달라 리스크있음
+        // const date = new Date(dataString);
+        // if(date.toString() === 'Invalid Date'){
+        //   alert('존재하지 않는 날짜 형식입니다');
+        //   App.resetData(this.inDate);
+        //   return false;
+        // }else{
+        //   alert('유효한 날짜입니다.');
+        // }
+
+        // 2차 작성 - 윤년이 new Date() 객체로 자동으로 다음 날짜로 넘어가져서 정상적으로 노출을 방지하기 위해 문자열에서 숫자들을 분리해서 Date 객체에 넣는 방식으로 작성
+        // 1. 문자열에서 원본 숫자들을 미리 분리
+        const parts = dataString.split(/[- :]/); // 정규식으로 구분자(-, :, 공백)로 문자열을 나눔
+        const [year, month, day, hour, minute, second] = parts.map(Number);
+
+        // 2. 분리된 숫자들을 Date 객체에 넣어 날짜 생성
+        const date = new Date(year, month - 1, day, hour, minute, second);
+
+        // 자바스크립트가 멋대로 날짜를 넘겼는지 비교 (윤년확인)
+        if(
+          date.getFullYear() !== year ||
+          date.getMonth() + 1 !== month ||
+          date.getDate() !== day ||
+          date.getHours() !== hour ||
+          date.getMinutes() !== minute ||
+          date.getSeconds() !== second
+        ){
+          alert('존재하지 않는 날짜 형식입니다');
+          App.resetData(this.inDate);
+          return false;
+        }else{
+          alert('유효한 날짜입니다.');
+        }
+      },
+
+      // 이벤트 바인딩
+      bindEvents: function(){
+        this.btnValidate.addEventListener('click', () => {
+          this.chkValidate(this.inDate);
+        });
+      },
+
+      // 로드시 초기 세팅
+      init: function(){
+        this.inDate = document.querySelector('.ip_date');
+        this.btnValidate = document.querySelector('.btn_validate');
+
+        this.bindEvents();
+      }
+    };
+
+    App.init();
+  </script>
+</body>
+</html>
