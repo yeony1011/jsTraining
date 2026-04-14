@@ -49,8 +49,8 @@
       chkDate: function(dataString){
         // 1. 문자열에서 원본 숫자들을 미리 분리
         const parts = dataString.split(/[- :]/); // 정규식으로 구분자(-, :, 공백)로 문자열을 나눔
-        const [year, month, day, hour, minute, second] = parts.map(Number);
-
+        const [year, month, day, hour, minute, second] = parts.map(Number); // 구조분해할당
+        
         // 2. 분리된 숫자들을 Date 객체에 넣어 날짜 생성
         const date = new Date(year, month - 1, day, hour, minute, second);
 
@@ -88,7 +88,30 @@
 
       // 카운트다운 타이머
       countDown: function(dataString){
+        const targetDate = new Date(dataString).getTime();
+        const elCountDown = document.createElement('div');
         
+        const timer = setInterval(() => {
+          const now = new Date().getTime();
+          const distance = targetDate - now;
+
+          // 시간 계산 (일, 시, 분, 초)
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+          // 출력
+          elCountDown.textContent = `${days}일 ${hours}시간 ${minutes}분 ${seconds}초 남았습니다.`;
+
+          // 종료
+          if(distance <= 0){
+            clearInterval(timer);
+            alert('카운트다운이 종료되었습니다.');
+          }
+        }, 1000);
+
+        document.body.appendChild(elCountDown);
       },
 
       // 이벤트 바인딩
