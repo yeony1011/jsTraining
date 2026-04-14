@@ -12,12 +12,43 @@
   <input type="text" class="ip_date" placeholder="YYYY-MM-DD HH:MM:SS" pattern="\d{4}-\d{2}-\d{2} \d[0-9]{2}:\d[0-9]{2}:\d[0-9]{2}">
   <button type="button" class="btn_validate">날짜 검사하기</button>
   <script>
-    const App = {
+    const DateApp = {
+      // 1. 설정 및 상태 저장소
+      config: {
+        timerId: null, // 타이머 이름으로 null 초기화
+        selector: {
+          input: '.ip_date',
+          btn: '.btn_validate',
+          display: '.timer_display' // 결과를 보여줄 전용 공간
+        }
+      },
+
+      // 2. 초기화
+      init: function(){
+        this.elInput = document.querySelector(this.config.selector.input);
+        this.elBtn = document.querySelector(this.config.selector.btn);
+
+        // 화면에 숫자 출력할 div 요소 생성
+        this.elDisplay = document.createElement('div');
+        this.elDisplay.className = 'timer_display';
+        document.body.appendChild(this.elDisplay);
+
+        this.bindEvents();
+      },
+
+      // 3. 이벤트 연결
+      bindEvents: function(){
+        this.elBtn.addEventListener('click', () => {
+          this.chkValidate(this.elInput);
+        });
+      },
+
+      // 4. 검증 로직들
       // 빈값 체크
       isEmpty: function(element){
         if (!element.value.trim()) {
           alert('값이 비어있습니다');
-          App.resetData(element);
+          this.resetData(element);
           return false;
         } else {
           return true;
@@ -38,7 +69,7 @@
 
         if(!regExp.test(dateElement.value)){
           alert('잘못된 형식의 날짜 형식입니다');
-          App.resetData(dateElement);
+          this.resetData(dateElement);
           return false;
         }
 
@@ -64,12 +95,13 @@
           date.getSeconds() !== second
         ){
           alert('존재하지 않는 날짜 형식입니다');
-          App.resetData(this.inDate);
-          return false;
-        }else{
-          alert('유효한 날짜입니다.');
-          this.chkPastDate(dataString);
+          this.resetData(this.elInput);
+          return; // if문에서 함수를 호출해 결과값을 받아 2차 판정을 할때만 return false; 사용하고 그 외에는 여기서 함수 종료를 의하하는 return; 사용
+          // 검사만 하고 끝내는 함수(action) : return
+          // 맞는지 틀린지 대답해줘야 하는 함수(predicate) : return false;
         }
+
+        this.chkPastDate(dataString);
       },
 
       // 과거 날짜 체크
@@ -79,21 +111,33 @@
 
         if(inputDate.getTime() < todayDate.getTime()){
           alert('이미 지난 날짜입니다.');
-          return false;
-        }else{
-          alert('카운트다운 타이머 가능한 날짜입니다.');
-          this.countDown(dataString);
+          return; // if문에서 함수를 호출해 결과값을 받아 2차 판정을 할때만 return false; 사용하고 그 외에는 여기서 함수 종료를 의하하는 return; 사용
         }
+        
+        // 모든 검증 통과 시 타이머 시작
+        this.startTimer(dataString);
       },
 
-      // 카운트다운 타이머
-      countDown: function(dataString){
+      // 5. 타이머 실행
+      startTimer: function(dataString){
         const targetDate = new Date(dataString).getTime();
-        const elCountDown = document.createElement('div');
+
+        // [중요] 이미 실행 중인 타이머가 있다면 종료
+        if(this.config.timerId){
+          clearInterval(this.config.timerId);
+        }
         
-        const timer = setInterval(() => {
+        // 새로운 타이머의 ID를 config.timerId에 저장
+        this.config.timerId = setInterval(() => {
           const now = new Date().getTime();
           const distance = targetDate - now;
+
+          // 종료
+          if(distance <= 0){
+            clearInterval(this.config.timerId);
+            this.elDisplay.textContent = '카운트다운이 종료되었습니다.';
+            return;
+          }
 
           // 시간 계산 (일, 시, 분, 초)
           const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -102,35 +146,12 @@
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
           // 출력
-          elCountDown.textContent = `${days}일 ${hours}시간 ${minutes}분 ${seconds}초 남았습니다.`;
-
-          // 종료
-          if(distance <= 0){
-            clearInterval(timer);
-            alert('카운트다운이 종료되었습니다.');
-          }
+          this.elDisplay.textContent = `${days}일 ${hours}시간 ${minutes}분 ${seconds}초 남았습니다.`;
         }, 1000);
-
-        document.body.appendChild(elCountDown);
-      },
-
-      // 이벤트 바인딩
-      bindEvents: function(){
-        this.btnValidate.addEventListener('click', () => {
-          this.chkValidate(this.inDate);
-        });
-      },
-
-      // 로드시 초기 세팅
-      init: function(){
-        this.inDate = document.querySelector('.ip_date');
-        this.btnValidate = document.querySelector('.btn_validate');
-
-        this.bindEvents();
       }
     };
 
-    App.init();
+    DateApp.init();
   </script>
 </body>
 </html>
